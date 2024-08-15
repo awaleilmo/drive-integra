@@ -83,7 +83,7 @@ defineExpose({loadItems})
   <vue-good-table
     mode="remote"
     :totalRows="totalRecords"
-    :isloading.sync="isLoading"
+    :isloading="isLoading"
     :columns="columns"
     :line-numbers="true"
     :search-options="{
