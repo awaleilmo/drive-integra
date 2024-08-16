@@ -9,6 +9,7 @@ import { computed, onBeforeMount, ref } from 'vue'
 import imageLogin1 from '~/assets/lbg-1.png'
 import imageLogin2 from '~/assets/lbg-2.png'
 import logoDark from '~/assets/logo_dark.png'
+import userService from '~/services/user.service'
 import logoLight from '~/assets/logo_light.png'
 const theme = localStorage.getItem('theme')
 import Alert from '~/components/Alert.vue'
@@ -23,11 +24,7 @@ const props = defineProps({
   },
 })
 
-const credentials = ref({
-  email: '',
-  password: '',
-  onprogress: false,
-})
+const credentials = ref(userService)
 
 const alert = ref({
   message: '',
@@ -44,15 +41,7 @@ const form = useForm({
 
 const loginFn = async () => {
   credentials.value.onprogress = true
-  let service = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify(form.value),
-  })
-  let result = await service.json()
+  let result = await userService.login()
   if (result.status) {
     window.location.href = '/home'
   } else {
