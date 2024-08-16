@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 const props = defineProps({
   size: {
     type: String,
@@ -14,13 +14,32 @@ const changeDarkMode = () => {
   localStorage.setItem('theme', darkMode.value ? 'dark' : 'light')
   // window.location.reload()
 }
-onMounted(() => {
-  const savedTheme = localStorage.getItem('theme') || 'light'
+const checkDarkMode = () => {
+  let savedTheme = localStorage.getItem('theme')
+  if (!savedTheme) {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      savedTheme = 'dark'
+    } else {
+      savedTheme = 'light'
+    }
+  }
+  darkMode.value = savedTheme === 'dark'
   document.documentElement.setAttribute('data-theme', savedTheme)
   if (darkMode.value) {
     document.documentElement.classList.add('dark')
+  }else{
+    document.documentElement.classList.remove('dark')
   }
-  darkMode.value = savedTheme === 'dark'
+}
+onMounted(() => {
+  checkDarkMode()
+
+  const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)')
+  mediaQueryList.addEventListener('change', checkDarkMode)
+})
+
+onUnmounted(() => {
+  mediaQueryList.removeEventListener('change', checkDarkMode);
 })
 </script>
 <template>

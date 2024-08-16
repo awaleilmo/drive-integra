@@ -168,7 +168,7 @@ const loginFn = async () => {
             <DarkModeButton class="animate__animated animate__fadeInUp" />
           </div>
           <h3
-            class="animate__animated animate__fadeInUp mt-12 text-center text-xl font-semibold lg:mt-24"
+            class="animate__animated animate__fadeInUp mt-12 text-center text-2xl font-semibold lg:mt-24"
           >
             IPM Drive
           </h3>
