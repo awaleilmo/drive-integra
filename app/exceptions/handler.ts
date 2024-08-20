@@ -31,15 +31,15 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    */
   async handle(error: unknown, ctx: HttpContext) {
 
-    // API Unauthorized Access
-    if(error instanceof Error && error.name === 'E_UNAUTHORIZED_ACCESS') {
-      ctx.response.status(403).json({
-        status: false,
-        message: error.message
+    // // API Unauthorized Access
+    // if(error instanceof Error && error.name === 'E_UNAUTHORIZED_ACCESS') {
+    //   ctx.response.status(403).json({
+    //     status: false,
+    //     message: error.message
 
-      })
-      return
-    }
+    //   })
+    //   return 
+    // }
     return super.handle(error, ctx)
   }
 
