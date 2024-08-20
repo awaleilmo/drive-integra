@@ -12,24 +12,28 @@ import router from '@adonisjs/core/services/router'
 
 // Inertia Render Routes
 router.group(() => {
-
-    // Guest Routes
-    router.group(() => {
-        router.on('/').renderInertia('auth/login')
+  // Guest Routes
+  router
+    .group(() => {
+      router.on('/').renderInertia('auth/login')
     })
     .use(middleware.guest())
 
-    // Auth Routes
-    router.group(() => {
-        router.on('/home').renderInertia('home')
+  // Auth Routes
+  router
+    .group(() => {
+      router.on('/home').renderInertia('home')
     })
     .use(middleware.auth())
-
 })
 
-// API Routes 
-router.group(() => {
-    router.group(() => {
-        router.post('/auth/login', [UsersController, 'login'])
-    }).prefix('/users')
-}).prefix('/api').use(middleware.auth())
+// API Routes
+router
+  .group(() => {
+    router
+      .group(() => {
+        router.post('/auth/login', [UsersController, 'login']).use(middleware.guest())
+      })
+      .prefix('/users')
+  })
+  .prefix('/api')

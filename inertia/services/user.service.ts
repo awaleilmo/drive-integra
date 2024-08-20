@@ -46,7 +46,7 @@ class userService {
     }
   }
   async login(){
-    return await sysService.serviceGuest('POST', API_URL+'/login', this.data());
+    return await sysService.serviceGuest('POST', API_URL+'/auth/login', this.data());
   }
 }
 
