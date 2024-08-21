@@ -64,7 +64,7 @@ const menu = ref([
       class="absolute sm:relative bg-base-100 shadow-lg dark:shadow-success/20 h-screen w-2/3 sm:w-full"
       :class="['transition-all duration-500', props.side ? 'translate-x-0' : '-translate-x-72']"
     >
-      <div class="grid grid-rows-12 p-2 h-screen">
+      <div class="grid grid-rows-12 p-2 h-screen overflow-auto">
         <div class="flex justify-start items-center">
           <img
             alt="logo-dark"

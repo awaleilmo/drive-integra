@@ -29,7 +29,7 @@ const side = ref(false)
     <sideBar :side="side"  @toggleSide="sidebarFn"/>
 
     <div class="w-screen">
-      <nav class="navbar bg-base-100 shadow-lg dark:shadow-success/20">
+      <nav class="navbar bg-base-100 shadow-md dark:shadow-success/10">
         <div class="navbar-start">
           <div @click="sidebarFn" class="btn btn-ghost btn-circle">
             <iconify icon="solar:list-bold-duotone" height="2em" />
