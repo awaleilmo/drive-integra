@@ -175,7 +175,7 @@ const loginFn = async () => {
                   <div
                     class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3"
                   >
-                    <Iconify icon="solar:letter-line-duotone" height="1.5em" />
+                    <Iconify icon="solar:letter-broken" height="1.5em" />
                     <input
                       v-model="credentials.email"
                       placeholder="Email Address"
@@ -190,7 +190,7 @@ const loginFn = async () => {
                   <div
                     class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3"
                   >
-                    <Iconify icon="solar:key-square-2-line-duotone" height="1.5em" />
+                    <Iconify icon="solar:key-square-2-broken" height="1.5em" />
                     <input
                       v-model="credentials.password"
                       :type="passwordVisible ? 'text' : 'password'"
@@ -205,8 +205,8 @@ const loginFn = async () => {
                       <Iconify
                         :icon="
                           passwordVisible
-                            ? 'solar:eye-closed-line-duotone'
-                            : 'solar:eye-line-duotone'
+                            ? 'solar:eye-closed-broken'
+                            : 'solar:eye-broken'
                         "
                         height="1.5em"
                       />
@@ -222,7 +222,7 @@ const loginFn = async () => {
               </div>
               <div class="mt-6 animate__animated animate__fadeInUp">
                 <button type="submit" class="btn text-base gap-2 btn-primary btn-block">
-                  <Iconify icon="solar:login-2-bold" height="1.5em" />
+                  <Iconify icon="solar:login-broken" height="1.5em" />
                   Login
                 </button>
               </div>

@@ -7,12 +7,19 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
-      table.integer('folder_id').unsigned().nullable().references('id').inTable('folders').onDelete('CASCADE')
+      table
+        .integer('folder_id')
+        .unsigned()
+        .nullable()
+        .references('id')
+        .inTable('folders')
+        .onDelete('CASCADE')
       table.string('file_name', 255).notNullable()
       table.string('file_size', 255).notNullable()
       table.string('file_path', 255).notNullable()
       table.string('file_type', 255).notNullable()
       table.text('description').nullable()
+      table.boolean('is_starred').defaultTo(false)
 
       table.timestamp('opened_at').nullable()
       table.integer('opened_by').nullable()

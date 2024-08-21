@@ -47,13 +47,13 @@ onUnmounted(() => {
     <input type="checkbox" class="theme-controller" :checked="!darkMode" @change="changeDarkMode" />
     <iconify
       class="swap-on text-yellow-500"
-      icon="solar:sun-fog-bold-duotone"
+      icon="solar:sun-fog-broken"
       :width="props.size"
       :height="props.size"
     />
     <iconify
       class="swap-off"
-      icon="solar:moon-fog-bold-duotone"
+      icon="solar:moon-fog-broken"
       :width="props.size"
       :height="props.size"
     />

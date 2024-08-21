@@ -1,5 +1,15 @@
 <script setup>
 import layout from './app.vue'
+import  { ref } from 'vue'
+import sideBar  from './sideBar.vue'
+import DarkModeButton from '~/components/DarkModeButton.vue'
+
+
+const sidebarFn = () => {
+  side.value = !side.value
+}
+
+const side = ref(false)
 </script>
 
 <template>
@@ -14,30 +24,24 @@ import layout from './app.vue'
       );
       background-size: 40px 40px;
     "
+    class="flex justify-center"
   >
-    <nav>
-      <div class="navbar bg-base-100 shadow-lg">
+    <sideBar :side="side"  @toggleSide="sidebarFn"/>
+
+    <div class="w-screen">
+      <nav class="navbar bg-base-100 shadow-lg dark:shadow-success/20">
         <div class="navbar-start">
-          <div class="dropdown">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
-              <iconify icon="solar:list-bold-duotone" height="2em" />
-            </div>
-            <ul
-              tabindex="0"
-              class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-            >
-              <li><a>Homepage</a></li>
-              <li><a>Portfolio</a></li>
-              <li><a>About</a></li>
-            </ul>
+          <div @click="sidebarFn" class="btn btn-ghost btn-circle">
+            <iconify icon="solar:list-bold-duotone" height="2em" />
           </div>
         </div>
         <div class="navbar-center">
           <a class="btn btn-ghost text-xl">IPM Drive</a>
         </div>
         <div class="navbar-end">
+          <DarkModeButton class="btn btn-ghost btn-circle" />
           <button class="btn btn-ghost btn-circle">
-            <iconify icon="solar:card-search-line-duotone" height="2em" />
+            <iconify icon="solar:card-search-broken" height="2em" />
           </button>
           <button class="btn btn-ghost btn-circle">
             <div class="indicator">
@@ -46,10 +50,10 @@ import layout from './app.vue'
             </div>
           </button>
         </div>
-      </div>
-    </nav>
-    <main>
-      <slot />
-    </main>
+      </nav>
+      <main class="p-4">
+        <slot />
+      </main>
+    </div>
   </layout>
 </template>
