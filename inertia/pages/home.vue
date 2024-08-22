@@ -1,6 +1,6 @@
 <script setup>
 import Layout from '~/components/layout/dashboard.vue'
-import PanelDrive from '~/components/PanelDrive.vue';
+import PanelDrive from '~/components/PanelDrive.vue'
 </script>
 
 <template>
@@ -8,6 +8,8 @@ import PanelDrive from '~/components/PanelDrive.vue';
     <PanelDrive>
       <template #header>
         <h1>Drive Saya</h1>
+      </template>
+      <template #main>
       </template>
     </PanelDrive>
   </Layout>

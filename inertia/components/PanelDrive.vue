@@ -6,9 +6,9 @@
         </div>
         <div class="bg-base-100 rounded-b-xl px-4 py-4 shadow-lg mb-5 h-[calc(100%-2.5rem)] relative overflow-y-auto">
             <label class="text-md font-medium">Folder</label>
-            <div class="flex flex-row flex-wrap w-full justify-stretch gap-4 my-5 place-content-stretch">
+            <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full justify-stretch gap-4 my-5">
 
-                <FolderComponent />
+                <FolderComponent v-for="item in 20" :key="item" />
 
             </div>
             <label class="text-md font-medium">File</label>
@@ -17,6 +17,7 @@
                 <FileComponent />
 
             </div>
+            <slot name="main"></slot>
         </div>
     </div>
 </template>
