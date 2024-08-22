@@ -2,10 +2,7 @@
 import { data } from 'autoprefixer'
 import daisyui from 'daisyui'
 export default {
-  content: [
-    './resources/**/*.edge',
-    './inertia/**/*.{js,ts,jsx,tsx,vue}',
-  ],
+  content: ['./resources/**/*.edge', './inertia/**/*.{js,ts,jsx,tsx,vue}'],
   theme: {
     extend: {},
     fontFamily: {
@@ -46,7 +43,7 @@ export default {
     },
   },
   // eslint-disable-next-line unicorn/prefer-module
-  plugins: [ daisyui],
+  plugins: [daisyui],
   darkMode: 'class',
   daisyui: {
     themes: [

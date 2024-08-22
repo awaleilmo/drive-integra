@@ -23,7 +23,11 @@ router.group(() => {
   // Auth Routes
   router
     .group(() => {
-      router.get('/home', [HomeController, 'index'])
+      router.get('/home', [HomeController, 'home'])
+      router.get('/shared', [HomeController, 'shared'])
+      router.get('/latest', [HomeController, 'latest'])
+      router.get('/starry', [HomeController, 'starry'])
+      router.get('/trash', [HomeController, 'trash'])
       router.post('/logout', [UsersController, 'logout'])
     })
     .use(middleware.auth())

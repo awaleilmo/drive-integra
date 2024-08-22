@@ -7,7 +7,7 @@ import PanelDrive from '~/components/PanelDrive.vue';
   <Layout>
     <PanelDrive>
       <template #header>
-        <h1>Drive Saya</h1>
+        <h1>Dibagikan kepada saya</h1>
       </template>
     </PanelDrive>
   </Layout>

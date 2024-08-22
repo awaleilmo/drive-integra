@@ -1,20 +1,30 @@
 <script setup>
 import layout from './app.vue'
-import  { ref } from 'vue'
-import sideBar  from './sideBar.vue'
+import { ref, onBeforeMount, onMounted } from 'vue'
+import sideBar from './sideBar.vue'
 import DarkModeButton from '~/components/DarkModeButton.vue'
 
 
 const sidebarFn = () => {
   side.value = !side.value
+  localStorage.setItem('sidebar', side.value)
+
 }
 
+const isRender = ref(false)
+
 const side = ref(false)
+onBeforeMount(() => {
+  side.value = localStorage.getItem('sidebar') === 'true'
+})
+
+onMounted(() => {
+  isRender.value = true
+})
 </script>
 
 <template>
-  <layout
-    style="
+  <layout v-if="isRender" style="
       background-image: repeating-linear-gradient(
         45deg,
         var(--fallback-b1, oklch(var(--b1))),
@@ -23,10 +33,8 @@ const side = ref(false)
         var(--fallback-b2, oklch(var(--b2))) 14px
       );
       background-size: 40px 40px;
-    "
-    class="flex justify-center"
-  >
-    <sideBar :side="side"  @toggleSide="sidebarFn"/>
+    " class="flex justify-center">
+    <sideBar :side="side" @toggleSide="sidebarFn" />
 
     <div class="w-screen">
       <nav class="navbar bg-base-100 shadow-md dark:shadow-success/10">

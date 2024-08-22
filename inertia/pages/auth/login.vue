@@ -57,9 +57,9 @@ const loginFn = async () => {
 
 <template>
   <Applayout>
-    <div class="grid h-screen grid-cols-12">
+    <div class="flex h-screen flex-row justify-center items-center">
       <div
-        class="relative h-screen hidden bg-[#FFE9D1] dark:bg-[#14181c] lg:col-span-7 lg:block xl:col-span-8 2xl:col-span-9"
+        class="relative h-screen hidden md:inline bg-[#FFE9D1] dark:bg-[#14181c] w-full"
       >
         <div
           class="absolute animate__animated animate__flipInY animate__fast inset-0 flex items-center justify-center"
@@ -67,20 +67,14 @@ const loginFn = async () => {
           <img
             alt="Auth Image"
             loading="lazy"
-            width="70%"
-            decoding="async"
-            data-nimg="1"
-            class="object-cover absolute hidden dark:inline"
+            class="object-cover absolute hidden dark:inline h-[90vh]"
             style="color: transparent"
             :src="imageLogin2"
           />
           <img
             alt="Auth Image"
             loading="lazy"
-            width="1140em"
-            decoding="async"
-            data-nimg="1"
-            class="object-cover inline dark:hidden"
+            class="object-cover inline dark:hidden h-[95vh]"
             style="color: transparent"
             :src="imageLogin1"
           />
@@ -127,7 +121,7 @@ const loginFn = async () => {
           </div>
         </div>
       </div>
-      <div class="col-span-12 lg:col-span-5 xl:col-span-4 2xl:col-span-3">
+      <div class="relative h-screen">
         <div class="flex flex-col items-stretch overflow-y-auto h-screen p-8 lg:p-16">
           <div class="flex items-center justify-between">
             <div class="inline animate__animated animate__fadeInUp hover:animate__infinite">

@@ -31,22 +31,22 @@ const menu = ref([
   {
     title: 'Dibagikan kepada saya',
     icon: 'solar:users-group-rounded-broken',
-    link: '/home',
+    link: '/shared',
   },
   {
     title: 'Terbaru',
     icon: 'solar:clock-circle-broken',
-    link: '/home',
+    link: '/latest',
   },
   {
     title: 'Berbintang',
     icon: 'solar:medal-ribbons-star-broken',
-    link: '/home',
+    link: '/starry',
   },
   {
     title: 'Sampah',
     icon: 'solar:trash-bin-trash-broken',
-    link: '/home',
+    link: '/trash',
   },
 ])
 </script>
@@ -90,7 +90,7 @@ const menu = ref([
         <div class="row-span-8 overflow-auto">
           <ul class="menu">
             <li v-for="(item, index) in menu" :key="index">
-              <a class="font-semibold" :href="item.url">
+              <a class="font-semibold" :href="item.link">
                 <iconify :icon="item.icon" height="1.5em" />
                 {{ item.title }}
               </a>
