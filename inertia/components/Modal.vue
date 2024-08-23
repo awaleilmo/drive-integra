@@ -67,7 +67,7 @@ const maxWidthClass = computed(() => {
 
 <template>
     <transition leave-active-class="duration-200">
-        <div v-show="show" class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50 items-center justify-center">
+        <div v-show="show" class="fixed flex items-center inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50 items-center justify-center">
             <transition
                 enter-active-class="ease-out duration-300"
                 enter-from-class="opacity-0"
@@ -91,7 +91,7 @@ const maxWidthClass = computed(() => {
             >
                 <div
                     v-show="show"
-                    class="my-6 bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
+                    class="my-6 bg-base-100 rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
                     :class="maxWidthClass"
                 >
                     <slot v-if="show"/>
