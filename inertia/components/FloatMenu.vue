@@ -14,12 +14,36 @@ const folderModal = ref({
     path: '/',
     userId: null,
 })
+const resetModel = () => {
+    folderModal.value.name = 'folder tanpa nama';
+    folderModal.value.path = '/';
+    folderModal.value.userId = null;
+    folderModal.value.open = false;
+}
 const close = () => {
     active.value = false;
 };
 
+const closeFolderModal = () => {
+    resetModel();
+}
+
 const folderFn = () => {
     folderModal.value.open = true;
+    
+}
+
+const fileBrowse = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = (e) => {
+        const files = e.target.files[0];
+        folderModal.value.name = files.name;
+        folderModal.value.path = files.webkitRelativePath;
+        console.log(files);
+        
+    }
+    input.click()
 }
 
 
@@ -50,7 +74,8 @@ const folderFn = () => {
                         </li>
                         <hr class="my-2"/>
                         <li>
-                            <a>
+                            <a @click="fileBrowse">
+                                <input type="file" class="hidden" id="fileButton"/>
                                 <iconify icon="solar:file-send-bold-duotone" class="text-orange-500 dark:text-blue-600" height="1.8em" />
                                 <span class="text-sm font-medium">Upload File</span>
                             </a>
@@ -70,12 +95,12 @@ const folderFn = () => {
         </div>
     </div>
 
-    <Modal :show="folderModal.open" @close="folderModal.open = false" maxWidth="sm">
+    <Modal :show="folderModal.open" @close="closeFolderModal" maxWidth="sm">
         <div class="py-6 px-6 form-control">
             <label class="text-2xl font-medium">Folder Baru</label>
-            <input type="text" placeholder="Type here" class="input input-bordered w-full mt-5" />
+            <input id="inputFolderName" type="text" placeholder="Folder Tanpa Nama" v-model="folderModal.name" autofocus class="input input-bordered w-full mt-5" />
             <div class="mt-3 flex justify-end gap-4">
-                <div class="btn btn-sm btn-ghost text-blue-400">Batal</div>
+                <div @click="closeFolderModal" class="btn btn-sm btn-ghost text-red-400">Batal</div>
                 <div class="btn btn-sm btn-ghost text-blue-400">Buat</div>
             </div>
         </div>

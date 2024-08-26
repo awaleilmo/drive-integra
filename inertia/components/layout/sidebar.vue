@@ -90,7 +90,7 @@ const menu = ref([
         <ul class="menu">
           <li v-for="(item, index) in menu" :key="index">
             <a class="font-semibold" :href="item.link">
-              <iconify :icon="item.icon" height="1.5em" />
+              <iconify :icon="item.icon" height="1.5em" class="text-orange-400 dark:text-blue-600" />
               {{ item.title }}
             </a>
           </li>

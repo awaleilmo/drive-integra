@@ -108,30 +108,30 @@ watch(open, (newVal) => {
         <!-- Full Screen Dropdown Overlay -->
         <div v-show="open" class="fixed inset-0 z-40" @click="open = false"></div>
         <div v-if="open" class="absolute z-50 mt-2" ref="dropdownMenu" :class="[widthClass, alignmentLRClasses, alignmentTBClasses]">
-            <ul class="menu bg-base-200 rounded-box z-[1] w-60 p-2 shadow">
+            <ul class="menu bg-base-200 rounded-box z-[1] w-60 p-2 shadow ">
                 <li>
                     <a>
-                        <iconify icon="solar:download-bold-duotone" class="font-bold" height="1.8em" />
+                        <iconify icon="solar:download-bold" class="font-bold text-orange-400 dark:text-blue-600" height="1.8em" />
                         Download
                     </a>
                 </li>
                 <li>
                     <a>
-                        <iconify icon="solar:pen-2-bold-duotone" class="font-bold" height="1.8em" />Ganti
+                        <iconify icon="solar:pen-2-bold-duotone" class="font-bold text-orange-400 dark:text-blue-600" height="1.8em" />Ganti
                         Nama
                     </a>
                 </li>
                 <hr class="my-2" />
                 <li>
                     <a>
-                        <iconify icon="solar:share-bold-duotone" class="font-bold" height="1.8em" />Bagikan
+                        <iconify icon="solar:share-bold-duotone" class="font-bold text-orange-400 dark:text-blue-600" height="1.8em" />Bagikan
                     </a>
                 </li>
                 <li class="dropdown" :class="[alignmentLRSubDropdown]">
                     <a tabindex="0" role="button">
-                        <iconify icon="solar:folder-open-bold-duotone" class="font-bold" height="1.8em" />
+                        <iconify icon="solar:folder-open-bold-duotone" class="font-bold text-orange-400 dark:text-blue-600" height="1.8em" />
                         Atur
-                        <iconify icon="solar:alt-arrow-right-bold" class="font-bold" height="1.2em" />
+                        <iconify icon="solar:alt-arrow-right-bold" class="font-bold text-orange-400 dark:text-blue-600" height="1.2em" />
                     </a>
                     <ul tabindex="0" ref="subDropdownButton"
                         class="dropdown-content z-10 menu p-2 shadow bg-base-100 rounded-box w-64" 
@@ -140,13 +140,13 @@ watch(open, (newVal) => {
 
                         <li>
                             <a href="#">
-                                <iconify icon="solar:move-to-folder-bold-duotone" class="font-bold" height="1.8em" />
+                                <iconify icon="solar:move-to-folder-bold-duotone" class="font-bold text-orange-400 dark:text-blue-600" height="1.8em" />
                                 Pindahkan
                             </a>
                         </li>
                         <li>
                             <a href="#">
-                                <iconify icon="solar:star-outline" class="font-bold" height="1.8em" />
+                                <iconify icon="solar:star-outline" class="font-bold text-orange-400 dark:text-blue-600" height="1.8em" />
                                 Tambahkan ke berbintang
                             </a>
                         </li>
@@ -154,14 +154,14 @@ watch(open, (newVal) => {
                 </li>
                 <li>
                     <a>
-                        <iconify icon="solar:info-circle-bold-duotone" class="font-bold" height="1.8em" />
+                        <iconify icon="solar:info-circle-bold" class="font-bold text-orange-400 dark:text-blue-600" height="1.8em" />
                         Informasi folder
                     </a>
                 </li>
                 <hr class="my-2" />
                 <li>
                     <a>
-                        <iconify icon="solar:trash-bin-trash-bold-duotone" class="font-bold" height="1.8em" />
+                        <iconify icon="solar:trash-bin-trash-bold-duotone" class="font-bold text-orange-400 dark:text-blue-600" height="1.8em" />
                         Pindahkan ke sampah
                     </a>
                 </li>

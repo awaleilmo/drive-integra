@@ -22,6 +22,9 @@ export default class Folder extends BaseModel {
   declare folderPath: string
 
   @column()
+  declare isStarred: boolean
+
+  @column()
   declare openedAt: DateTime | null
 
   @column()
