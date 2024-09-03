@@ -8,6 +8,7 @@
 */
 const UsersController = () => import('#controllers/users_controller')
 const HomeController = () => import('#controllers/home_controller')
+const FoldersController = () => import('#controllers/folders_controller')
 import { middleware } from '../start/kernel.js'
 import router from '@adonisjs/core/services/router'
 
@@ -41,5 +42,11 @@ router
         router.post('/auth/login', [UsersController, 'login']).use(middleware.guest())
       })
       .prefix('/users')
+    router
+      .group(() => {
+        router.post('/add', [FoldersController, 'addFolder'])
+      })
+      .prefix('/folder')
+      .use(middleware.auth())
   })
   .prefix('/api')

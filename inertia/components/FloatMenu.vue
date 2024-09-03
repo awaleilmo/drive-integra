@@ -4,10 +4,11 @@ import PrimaryButton from "~/components/PrimaryButton.vue";
 import Modal from "~/components/Modal.vue";
 import DangerButton from "~/components/DangerButton.vue";
 import { Link } from '@inertiajs/vue3';
-import NavLink from "~/components/NavLink.vue";
+import { useStore } from 'vuex';
 
 // data
 const active = ref(false);
+const store = useStore();
 const folderModal = ref({
     open: false,
     name: 'folder tanpa nama',
@@ -30,7 +31,20 @@ const closeFolderModal = () => {
 
 const folderFn = () => {
     folderModal.value.open = true;
-    
+}
+
+
+const folderSave = async () => {
+    await store.dispatch('showLoading');
+
+    try {
+        // Simulasi pemanggilan API
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+    } catch (error) {
+        console.error(error);
+    } finally {
+        await store.dispatch('hideLoading');
+    }
 }
 
 const fileBrowse = () => {
@@ -41,7 +55,7 @@ const fileBrowse = () => {
         folderModal.value.name = files.name;
         folderModal.value.path = files.webkitRelativePath;
         console.log(files);
-        
+
     }
     input.click()
 }
@@ -65,24 +79,27 @@ const fileBrowse = () => {
             <div v-show="active" class=" rounded-lg overflow-hidden transform transition-all sm:w-full sm:mx-auto">
                 <div v-if="active"
                     class="menu bg-base-100 border border-base-300 py-4 my-2 dark:border-white/50 shadow-lg rounded-lg">
-                    <ul >
+                    <ul>
                         <li @click="folderFn">
                             <a>
-                                <iconify icon="solar:add-folder-bold-duotone" class="text-orange-600 dark:text-blue-600" height="1.8em" />
+                                <iconify icon="solar:add-folder-bold-duotone" class="text-orange-600 dark:text-blue-600"
+                                    height="1.8em" />
                                 <span class="text-sm font-medium">Folder baru</span>
                             </a>
                         </li>
-                        <hr class="my-2"/>
+                        <hr class="my-2" />
                         <li>
                             <a @click="fileBrowse">
-                                <input type="file" class="hidden" id="fileButton"/>
-                                <iconify icon="solar:file-send-bold-duotone" class="text-orange-500 dark:text-blue-600" height="1.8em" />
+                                <input type="file" class="hidden" id="fileButton" />
+                                <iconify icon="solar:file-send-bold-duotone" class="text-orange-500 dark:text-blue-600"
+                                    height="1.8em" />
                                 <span class="text-sm font-medium">Upload File</span>
                             </a>
                         </li>
                         <li>
                             <a>
-                                <iconify icon="solar:move-to-folder-bold-duotone" class="text-orange-500 dark:text-blue-600" height="1.8em" />
+                                <iconify icon="solar:move-to-folder-bold-duotone"
+                                    class="text-orange-500 dark:text-blue-600" height="1.8em" />
                                 <span class="text-sm font-medium">Upload Folder</span>
                             </a>
                         </li>
@@ -90,7 +107,7 @@ const fileBrowse = () => {
                 </div>
             </div>
         </transition>
-        <div class="btn btn-success btn-circle btn-lg ml-auto transform shadow-lg" @click="active = !active" >
+        <div class="btn btn-success btn-circle btn-lg ml-auto transform shadow-lg" @click="active = !active">
             <iconify height="3em" class="text-base-100" icon="solar:add-circle-broken" />
         </div>
     </div>
@@ -98,10 +115,11 @@ const fileBrowse = () => {
     <Modal :show="folderModal.open" @close="closeFolderModal" maxWidth="sm">
         <div class="py-6 px-6 form-control">
             <label class="text-2xl font-medium">Folder Baru</label>
-            <input id="inputFolderName" type="text" placeholder="Folder Tanpa Nama" v-model="folderModal.name" autofocus class="input input-bordered w-full mt-5" />
+            <input id="inputFolderName" type="text" placeholder="Folder Tanpa Nama" v-model="folderModal.name" autofocus
+                class="input input-bordered w-full mt-5" />
             <div class="mt-3 flex justify-end gap-4">
                 <div @click="closeFolderModal" class="btn btn-sm btn-ghost text-red-400">Batal</div>
-                <div class="btn btn-sm btn-ghost text-blue-400">Buat</div>
+                <div @click="folderSave" class="btn btn-sm btn-ghost text-blue-400">Buat</div>
             </div>
         </div>
     </Modal>

@@ -1,8 +1,11 @@
 <script setup>
 import layout from './app.vue'
-import { ref, onBeforeMount, onMounted } from 'vue'
+import { ref, onBeforeMount, onMounted, onUnmounted, computed } from 'vue'
 import sideBar from './sideBar.vue'
+import Loading from '~/components/Loading.vue'
 import DarkModeButton from '~/components/DarkModeButton.vue'
+import { getLoadingStatus, setLoadingStatus } from '~/services/utils.service'
+import { useStore } from 'vuex'
 
 
 const sidebarFn = () => {
@@ -11,9 +14,14 @@ const sidebarFn = () => {
 
 }
 
+const store = useStore();
+
+const isLoading = computed(() => store.getters.isLoading);
+
 const isRender = ref(false)
 
 const side = ref(false)
+
 onBeforeMount(() => {
   side.value = localStorage.getItem('sidebar') === 'true'
 })
@@ -21,6 +29,7 @@ onBeforeMount(() => {
 onMounted(() => {
   isRender.value = true
 })
+
 </script>
 
 <template>
@@ -64,4 +73,5 @@ onMounted(() => {
       </main>
     </div>
   </layout>
+  <loading :loading="isLoading" />
 </template>
