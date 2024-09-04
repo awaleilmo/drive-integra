@@ -4,7 +4,6 @@ import { ref, onBeforeMount, onMounted, onUnmounted, computed } from 'vue'
 import sideBar from './sideBar.vue'
 import Loading from '~/components/Loading.vue'
 import DarkModeButton from '~/components/DarkModeButton.vue'
-import { getLoadingStatus, setLoadingStatus } from '~/services/utils.service'
 import { useStore } from 'vuex'
 
 

@@ -42,11 +42,19 @@ router
         router.post('/auth/login', [UsersController, 'login']).use(middleware.guest())
       })
       .prefix('/users')
+
     router
       .group(() => {
         router.post('/add', [FoldersController, 'addFolder'])
       })
       .prefix('/folder')
+      .use(middleware.auth())
+
+    router
+      .group(() => {
+        router.get('/', [HomeController, 'dataFolderAndFile'])
+      })
+      .prefix('/home')
       .use(middleware.auth())
   })
   .prefix('/api')

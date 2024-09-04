@@ -1,11 +1,10 @@
 <script setup>
 import 'animate.css'
 import Applayout from '~/components/layout/app.vue'
-import ApplicationLogo from '~/components/ApplicationLogo.vue'
 import DarkModeButton from '~/components/DarkModeButton.vue'
 import Loading from '~/components/Loading.vue'
 import { Link, useForm } from '@inertiajs/vue3'
-import { computed, onBeforeMount, ref } from 'vue'
+import { ref } from 'vue'
 import imageLogin1 from '~/assets/lbg-1.png'
 import imageLogin2 from '~/assets/lbg-2.png'
 import logoDark from '~/assets/logo_dark.png'

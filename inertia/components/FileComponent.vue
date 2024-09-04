@@ -2,8 +2,9 @@
     <div
         class="shadow-md dark:shadow-base-content/30 select-none bg-base-200 basis-1/8 max-w-1/8 rounded-lg hover:btn-active">
         <div class=" flex justify-start items-center gap-2 px-4 py-2">
-            <Iconify icon="solar:folder-bold-duotone" class="grow-0 text-orange-400 dark:text-blue-600" height="1.5em" />
-            <div class="grow text-left w-28 truncate">SOLAR</div>
+            <Iconify icon="solar:folder-bold-duotone" class="grow-0 text-orange-400 dark:text-blue-600"
+                height="1.5em" />
+            <div class="grow text-left w-28 truncate">{{ props.data.folderName }}</div>
             <DetailDrop />
         </div>
         <div v-if="props.preview"
@@ -19,6 +20,10 @@ const props = defineProps({
     preview: {
         type: Boolean,
         default: false
+    },
+    data: {
+        type: Object,
+        default: {}
     }
 })
 

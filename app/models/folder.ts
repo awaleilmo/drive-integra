@@ -63,29 +63,8 @@ export default class Folder extends BaseModel {
   })
   declare folders: HasMany<typeof Folders>
 
-  @hasMany(() => Upload)
+  @hasMany(() => Upload, {
+    foreignKey: 'folderId',
+  })
   declare uploads: HasMany<typeof Upload>
-
-  @beforeCreate()
-  static async createAndUpdateBy(folder: Folder) {
-    const auth = HttpContext.get()?.auth
-    if (auth) {
-      const userId = auth.user?.id
-      if (userId) {
-        folder.createdBy = userId
-        folder.updatedBy = userId
-      }
-    }
-  }
-
-  @beforeUpdate()
-  static async UpdateBy(folder: Folder) {
-    const auth = HttpContext.get()?.auth
-    if (auth) {
-      const userId = auth.user?.id
-      if (userId) {
-        folder.updatedBy = userId
-      }
-    }
-  }
 }

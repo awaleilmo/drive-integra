@@ -15,8 +15,15 @@ export default class FoldersController {
         rest.parentId = parentId
         rest.folderName = payload.folderName
         rest.folderPath = payload.folderName
+        rest.createdBy = userId
+        rest.updatedBy = userId
+        await rest.save()
+        return ctx.response.json({
+          status: true,
+          message: 'Folder ditambahkan',
+        })
       }
-      ctx.response.json({
+      return ctx.response.json({
         status: false,
         message: 'Folder sudah ada',
       })
