@@ -10,8 +10,8 @@ export default class extends BaseSeeder {
         username: 'superadmin',
         email: 'SuperAdmin@integrapadma.com',
         password: 'SuperAdmin2020',
-        isActive: 1
-      }
+        isActive: 1,
+      },
     ])
   }
 }

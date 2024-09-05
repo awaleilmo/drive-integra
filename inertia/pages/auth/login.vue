@@ -57,9 +57,7 @@ const loginFn = async () => {
 <template>
   <Applayout>
     <div class="flex h-screen flex-row justify-center items-center">
-      <div
-        class="relative h-screen hidden md:inline bg-[#FFE9D1] dark:bg-[#14181c] w-full"
-      >
+      <div class="relative h-screen hidden md:inline bg-[#FFE9D1] dark:bg-[#14181c] w-full">
         <div
           class="absolute animate__animated animate__flipInY animate__fast inset-0 flex items-center justify-center"
         >
@@ -81,7 +79,10 @@ const loginFn = async () => {
         <div
           class="animate__animated animate__pulse animate__slow animate__infinite absolute bottom-[15%] right-[15%]"
         >
-          <div aria-label="Card" class="card w-96 bg-base-100/80 backdrop-blur-sm dark:backdrop-blur card-bordered">
+          <div
+            aria-label="Card"
+            class="card w-96 bg-base-100/80 backdrop-blur-sm dark:backdrop-blur card-bordered"
+          >
             <div class="card-body p-6">
               <div class="flex flex-col items-center justify-center">
                 <img
@@ -191,16 +192,12 @@ const loginFn = async () => {
                       class="input w-full focus:border-transparent focus:outline-0 transition-all input-md focus:outline-offset-0"
                       name="password"
                     /><button
-                    type="button"
+                      type="button"
                       @click="passwordVisible = !passwordVisible"
                       class="btn hover:bg-base-content/10 btn-xs btn-circle btn-ghost"
                     >
                       <Iconify
-                        :icon="
-                          passwordVisible
-                            ? 'solar:eye-closed-broken'
-                            : 'solar:eye-broken'
-                        "
+                        :icon="passwordVisible ? 'solar:eye-closed-broken' : 'solar:eye-broken'"
                         height="1.5em"
                       />
                     </button>

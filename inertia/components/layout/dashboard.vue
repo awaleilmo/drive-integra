@@ -6,16 +6,14 @@ import Loading from '~/components/Loading.vue'
 import DarkModeButton from '~/components/DarkModeButton.vue'
 import { useStore } from 'vuex'
 
-
 const sidebarFn = () => {
   side.value = !side.value
   localStorage.setItem('sidebar', side.value)
-
 }
 
-const store = useStore();
+const store = useStore()
 
-const isLoading = computed(() => store.getters.isLoading);
+const isLoading = computed(() => store.getters.isLoading)
 
 const isRender = ref(false)
 
@@ -28,11 +26,12 @@ onBeforeMount(() => {
 onMounted(() => {
   isRender.value = true
 })
-
 </script>
 
 <template>
-  <layout v-if="isRender" style="
+  <layout
+    v-if="isRender"
+    style="
       background-image: repeating-linear-gradient(
         45deg,
         var(--fallback-b1, oklch(var(--b1))),
@@ -41,7 +40,9 @@ onMounted(() => {
         var(--fallback-b2, oklch(var(--b2))) 14px
       );
       background-size: 40px 40px;
-    " class="flex justify-center">
+    "
+    class="flex justify-center"
+  >
     <sideBar :side="side" @toggleSide="sidebarFn" />
 
     <div class="w-screen">

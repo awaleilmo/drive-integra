@@ -27,7 +27,7 @@ const checkDarkMode = () => {
   document.documentElement.setAttribute('data-theme', savedTheme)
   if (darkMode.value) {
     document.documentElement.classList.add('dark')
-  }else{
+  } else {
     document.documentElement.classList.remove('dark')
   }
 }
@@ -39,7 +39,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  mediaQueryList.removeEventListener('change', checkDarkMode);
+  mediaQueryList.removeEventListener('change', checkDarkMode)
 })
 </script>
 <template>

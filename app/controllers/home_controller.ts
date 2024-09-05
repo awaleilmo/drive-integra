@@ -1,21 +1,32 @@
 import Folder from '#models/folder'
 import Upload from '#models/upload'
 import type { HttpContext } from '@adonisjs/core/http'
+import BreadcrumbsService from '#services/breadcrumb_service'
+import { decrypt } from '#services/encryption_service'
 
 export default class HomeController {
   async home(ctx: HttpContext) {
     const userId = ctx.auth.user?.id || 0
-    const folderId = ctx.request.input('folderId', null)
+    let folderId = ctx.request.input('folders', null)
+    let decryptId = ''
+    if (folderId !== null) {
+      decryptId = decrypt(folderId)
+      const splitDec = decryptId.split(':')
+      folderId = Number.parseInt(splitDec[1])
+    }
+    console.log('ini folder = ', folderId)
+    const breadcrumbs = await BreadcrumbsService.getBreadcrumbs(folderId)
     const folderData = await Folder.query()
       .where('user_id', userId)
       .where('parentId', folderId)
       .withCount('uploads')
       .preload('uploads')
-    const fileData = await Upload.query().where('user_id', userId).where('folderId', folderId)
+    const fileData = await Upload.query().where('user_id', userId)
     return ctx.inertia.render('home', {
       auth: ctx.auth.user,
       folder: () => folderData,
       file: () => fileData,
+      breadcrumbs: () => breadcrumbs,
     })
   }
   async shared(ctx: HttpContext) {

@@ -1,9 +1,7 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
-    <div class="h-screen">
-        <slot />
-    </div>
+  <div class="h-screen">
+    <slot />
+  </div>
 </template>

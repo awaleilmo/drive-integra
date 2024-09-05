@@ -2,17 +2,16 @@
 import { watchEffect } from 'vue'
 const props = defineProps({
   alerts: {
-      type: Object,
-      default: {
-        type: 'default',
-        show: false,
-        message: 'New message!',
-      }
-  }
+    type: Object,
+    default: {
+      type: 'default',
+      show: false,
+      message: 'New message!',
+    },
+  },
 })
 
-watchEffect(
-  () => {
+watchEffect(() => {
   if (props.alerts.message) {
     props.alerts.show = true
     setTimeout(() => {
@@ -26,7 +25,7 @@ watchEffect(
   <div
     v-show="props.alerts.show"
     role="alert"
-    class=" alert shadow-lg transition delay-150 ease-in-out duration-300"
+    class="alert shadow-lg transition delay-150 ease-in-out duration-300"
     :class="{
       'alert-success': props.alerts.type === 'success',
       'alert-error': props.alerts.type === 'error',
