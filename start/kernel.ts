@@ -10,6 +10,8 @@
 
 import router from '@adonisjs/core/services/router'
 import server from '@adonisjs/core/services/server'
+import cron from 'node-cron'
+import ClearTrash from '../app/Tasks/ClearTrash.js'
 
 /**
  * The error handler is used to convert an exception
@@ -48,4 +50,12 @@ router.use([
 export const middleware = router.named({
   guest: () => import('#middleware/guest_middleware'),
   auth: () => import('#middleware/auth_middleware'),
+})
+
+/**
+ * scheduler
+ */
+
+cron.schedule('0 0 * * *', async () => {
+  await ClearTrash.run()
 })

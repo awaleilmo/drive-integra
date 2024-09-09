@@ -14,7 +14,10 @@ export default class HomeController {
       const splitDec = decryptId.split(':')
       folderId = Number.parseInt(splitDec[1])
     }
-    console.log('ini folder = ', folderId)
+    const checkFolder = await Folder.find(folderId)
+    if (!checkFolder) {
+      folderId = null
+    }
     const breadcrumbs = await BreadcrumbsService.getBreadcrumbs(folderId)
     const folderData = await Folder.query()
       .where('user_id', userId)

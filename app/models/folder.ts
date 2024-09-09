@@ -1,17 +1,9 @@
 import { DateTime } from 'luxon'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
-import {
-  BaseModel,
-  column,
-  belongsTo,
-  hasMany,
-  beforeCreate,
-  beforeUpdate,
-} from '@adonisjs/lucid/orm'
+import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import User from './user.js'
 import Upload from './upload.js'
 import Folders from './folder.js'
-import { HttpContext } from '@adonisjs/core/http'
 
 export default class Folder extends BaseModel {
   @column({ isPrimary: true })
