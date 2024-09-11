@@ -27,6 +27,12 @@ export default class Upload extends BaseModel {
   declare fileType: string
 
   @column()
+  declare fileExt: string
+
+  @column()
+  declare thumbnailPath: string
+
+  @column()
   declare isStarred: boolean
 
   @column()

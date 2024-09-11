@@ -18,6 +18,8 @@ export default class extends BaseSchema {
       table.string('file_size', 255).notNullable()
       table.string('file_path', 255).notNullable()
       table.string('file_type', 255).notNullable()
+      table.string('file_ext', 255).notNullable()
+      table.string('thumbnail_path', 255).nullable()
       table.text('description').nullable()
       table.boolean('is_starred').defaultTo(false)
 

@@ -1,8 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { addFolder } from '#validators/folder'
 import Folder from '#models/folder'
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import app from '@adonisjs/core/services/app'
 
 export default class FoldersController {

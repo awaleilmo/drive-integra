@@ -24,7 +24,7 @@ export default class HomeController {
       .where('parentId', folderId)
       .withCount('uploads')
       .preload('uploads')
-    const fileData = await Upload.query().where('user_id', userId)
+    const fileData = await Upload.query().where('user_id', userId).where('folderId', folderId)
     return ctx.inertia.render('home', {
       auth: ctx.auth.user,
       folder: () => folderData,

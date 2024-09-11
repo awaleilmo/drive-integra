@@ -9,7 +9,8 @@
 const UsersController = () => import('#controllers/users_controller')
 const HomeController = () => import('#controllers/home_controller')
 const FoldersController = () => import('#controllers/folders_controller')
-import { middleware } from '../start/kernel.js'
+const UploadsController = () => import('#controllers/uploads_controller')
+import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 
 // Inertia Render Routes
@@ -48,6 +49,13 @@ router
         router.post('/add', [FoldersController, 'addFolder'])
       })
       .prefix('/folder')
+      .use(middleware.auth())
+
+    router
+      .group(() => {
+        router.post('/', [UploadsController, 'store'])
+      })
+      .prefix('/uploads')
       .use(middleware.auth())
 
     router

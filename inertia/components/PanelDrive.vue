@@ -5,8 +5,12 @@
     >
       <div class="breadcrumbs">
         <ul>
-          <li><a :href="defaultHomeUrl"><slot name="header"></slot></a></li>
-          <li v-for="(item, index) in breadcrumbs" :key="index"><a class="capitalize" :href="item.url">{{ item.name }}</a></li>
+          <li>
+            <a :href="defaultHomeUrl"><slot name="header"></slot></a>
+          </li>
+          <li v-for="(item, index) in breadcrumbs" :key="index">
+            <a class="capitalize" :href="item.url">{{ item.name }}</a>
+          </li>
         </ul>
       </div>
     </div>
@@ -19,10 +23,10 @@
 </template>
 
 <script setup>
-  const props = defineProps({
-    breadcrumbs: Object,
-    defaultHomeUrl: String
-  })
+const props = defineProps({
+  breadcrumbs: Object,
+  defaultHomeUrl: String,
+})
 </script>
 
 <style></style>
