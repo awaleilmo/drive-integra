@@ -10,6 +10,7 @@ const UsersController = () => import('#controllers/users_controller')
 const HomeController = () => import('#controllers/home_controller')
 const FoldersController = () => import('#controllers/folders_controller')
 const UploadsController = () => import('#controllers/uploads_controller')
+const StartController = () => import('#controllers/start_controller')
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 
@@ -57,6 +58,11 @@ router
       })
       .prefix('/uploads')
       .use(middleware.auth())
+
+    router.group(() => {
+      router.get('/start/file/:id', [StartController, 'toggleStarFile'])
+      router.get('/start/folder/:id', [StartController, 'toggleStarFolder'])
+    }).prefix('/start').use(middleware.auth())
 
     router
       .group(() => {

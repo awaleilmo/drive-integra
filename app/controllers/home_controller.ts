@@ -36,7 +36,9 @@ export default class HomeController {
     return ctx.inertia.render('shared', { auth: ctx.auth.user })
   }
   async starry(ctx: HttpContext) {
-    return ctx.inertia.render('starry', { auth: ctx.auth.user })
+    const starredFiles = await Upload.query().where('userId', ctx.auth.user?.id).where('is_starred', true)
+    const starredFolders = await Folder.query().where('userId', ctx.auth.user?.id).where('is_starred', true)
+    return ctx.inertia.render('starry', { auth: ctx.auth.user, folder: starredFolders, file: starredFiles })
   }
   async latest(ctx: HttpContext) {
     return ctx.inertia.render('latest', { auth: ctx.auth.user })

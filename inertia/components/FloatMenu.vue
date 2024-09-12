@@ -4,7 +4,6 @@ import { useStore } from 'vuex'
 import FolderService from '~/services/folder.service.ts'
 import UploadService from '~/services/upload.service.ts'
 import Modal from '~/components/Modal.vue'
-import Alert from '~/components/Alert.vue'
 import { decrypt } from '~/services/crypto.service'
 
 // data
@@ -22,18 +21,15 @@ const fileData = ref({
   description: '',
 })
 const pathName = ref('')
-const alert = ref({
-  message: '',
-  type: 'default',
-  show: false,
-})
 const resetModel = () => {
   folderModal.value.name = ''
   folderModal.value.path = '/'
   folderModal.value.open = false
-  alert.value.message = ''
-  alert.value.type = 'default'
-  alert.value.show = false
+
+  fileData.value.id = null
+  fileData.value.folderId = null
+  fileData.value.file = null
+  fileData.value.description = ''
 }
 const close = () => {
   active.value = false
@@ -54,23 +50,16 @@ const folderSave = async () => {
     FolderService.folderName = folderModal.value.name
     let data = await FolderService.addFolder()
     if (data.status) {
-      alert.value = {
-        message: data.message,
-        type: 'success',
-        show: true,
-      }
+      await store.dispatch('triggerToast', { message: data.message, type: 'success' })
       closeFolderModal()
       window.location.reload()
     } else {
-      alert.value = {
-        message: data.message,
-        type: 'error',
-        show: true,
-      }
+      await store.dispatch('triggerToast', { message: data.message, type: 'error' })
     }
     await store.dispatch('hideLoading')
   } catch (error) {
-    console.error('test', error)
+    await store.dispatch('hideLoading')
+    await store.dispatch('triggerToast', { message: error.message, type: 'error' })
   }
 }
 
@@ -84,23 +73,17 @@ const fileSaveFn = async () => {
     formData.append('description', fileData.value.description)
     let data = await UploadService.Uploads(formData)
     if (data.status) {
-      alert.value = {
-        message: data.message,
-        type: 'success',
-        show: true,
-      }
+      await store.dispatch('triggerToast', { message: data.message, type: 'success' })
+      closeFolderModal()
       window.location.reload()
     } else {
-      alert.value = {
-        message: data.message,
-        type: 'error',
-        show: true,
-      }
+      await store.dispatch('triggerToast', { message: data.message, type: 'error' })
       fileData.value.file = null
     }
     await store.dispatch('hideLoading')
   } catch (error) {
-    console.error('test', error)
+    await store.dispatch('hideLoading')
+    await store.dispatch('triggerToast', { message: error.message, type: 'error' })
   }
 }
 
@@ -129,7 +112,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="fixed flex flex-col bottom-4 z-10 right-2 md:bottom-10 md:right-10 transition-all group"
+    class="fixed flex flex-col bottom-4 z-20 right-2 md:bottom-10 md:right-10 transition-all group"
   >
     <transition
       enter-active-class="ease-out duration-300"
@@ -206,7 +189,6 @@ onMounted(() => {
 
   <Modal :show="folderModal.open" @close="closeFolderModal" maxWidth="sm">
     <div class="py-6 px-6 form-control">
-      <alert :alerts="alert" @click="alert.show = false" />
       <label class="text-2xl font-medium">Folder Baru</label>
       <input
         @keyup.enter="folderSave"

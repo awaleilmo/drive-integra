@@ -12,9 +12,10 @@ export default class UploadsController {
       // const payload = await addUpload.validate(ctx.request.all)
 
       const files = ctx.request.file('file')
-      let folderId = null
+      let folderId = ctx.request.input('folderId', null)
       let folderPath = `uploads/${user.id}`
-      if (ctx.request.input('folderId')) {
+
+      if (folderId && folderId !== 'null' && folderId !== '') {
         const decryptId = decrypt(ctx.request.input('folderId'))
         const splitDec = decryptId.split(':')
         folderId = Number.parseInt(splitDec[1])
@@ -50,20 +51,35 @@ export default class UploadsController {
         })
       }
 
-      await Upload.updateOrCreate(
-        { fileName, userId: user.id, folderId: folderId },
-        {
-          folderId: folderId,
-          fileSize: files.size,
-          fileType: files.type,
-          filePath,
-          fileExt: files.extname,
-          thumbnailPath: files.type === 'image' ? thumbnailPath : null,
-          description: ctx.request.description,
-          createdBy: user.id,
-          updatedBy: user.id,
-        }
-      )
+      if (folderId && folderId !== 'null' && folderId !== '') {
+        await Upload.updateOrCreate(
+          { fileName, userId: user.id, folderId },  // Jika folderId tidak null
+          {
+            fileSize: files.size,
+            fileType: files.type,
+            filePath,
+            fileExt: files.extname,
+            thumbnailPath: files.type.startsWith('image') ? thumbnailPath : null,
+            description: ctx.request.input('description'),
+            createdBy: user.id,
+            updatedBy: user.id,
+          }
+        )
+      } else {
+        await Upload.updateOrCreate(
+          { fileName, userId: user.id },  // Jika folderId null
+          {
+            fileSize: files.size,
+            fileType: files.type,
+            filePath,
+            fileExt: files.extname,
+            thumbnailPath: files.type.startsWith('image') ? thumbnailPath : null,
+            description: ctx.request.input('description'),
+            createdBy: user.id,
+            updatedBy: user.id,
+          }
+        )
+      }
 
       return ctx.response.json({
         status: true,

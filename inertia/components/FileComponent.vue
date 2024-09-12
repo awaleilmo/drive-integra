@@ -15,7 +15,7 @@
     </div>
     <div
       v-if="props.preview"
-      class="my-2 rounded-md mx-2 flex justify-center items-center h-40 bg-white dark:bg-white/90 dark:text-base-300"
+      class="my-2 rounded-md mx-2 flex justify-center items-center  aspect-square bg-white dark:bg-white/90 dark:text-base-300"
     >
       <slot>
         <Iconify
@@ -28,7 +28,7 @@
         <img
           v-else
           :src="props.data.thumbnailPath"
-          class="grow-0 drop-shadow-lg rounded-lg w-full h-full object-cover"
+          class="grow-0 drop-shadow-lg rounded-lg w-full h-full object-top object-cover"
           :alt="props.data.fileName"
         />
       </slot>
