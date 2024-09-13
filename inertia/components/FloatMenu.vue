@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useStore } from 'vuex'
 import FolderService from '~/services/folder.service.ts'
 import UploadService from '~/services/upload.service.ts'
@@ -14,6 +14,7 @@ const folderModal = ref({
   name: '',
   path: '/',
 })
+const fileMultiple = computed(() => store.state.fileMultiple)
 const fileData = ref({
   id: null,
   folderId: null,
@@ -88,8 +89,10 @@ const fileSaveFn = async () => {
 }
 
 const fileChange = (e) => {
-  fileData.value.file = e.target.files[0]
-  fileSaveFn()
+  fileData.value.file = e.target.files
+  fileMultiple.value.push(...e.target.files)
+  // store.dispatch('setFileMultiple', e.target.files)
+  // fileSaveFn()
 }
 
 const fileBrowse = () => {
@@ -156,7 +159,7 @@ onMounted(() => {
             <hr class="my-2" />
             <li>
               <a @click="fileBrowse">
-                <input type="file" class="hidden" id="fileButton" @change="fileChange" />
+                <input type="file" class="hidden" id="fileButton" @change="fileChange" multiple/>
                 <iconify
                   icon="solar:file-send-bold-duotone"
                   class="text-orange-500 dark:text-blue-600"

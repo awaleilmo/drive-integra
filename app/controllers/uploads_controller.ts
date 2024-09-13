@@ -53,7 +53,7 @@ export default class UploadsController {
 
       if (folderId && folderId !== 'null' && folderId !== '') {
         await Upload.updateOrCreate(
-          { fileName, userId: user.id, folderId },  // Jika folderId tidak null
+          { fileName, userId: user.id, folderId }, // Jika folderId tidak null
           {
             fileSize: files.size,
             fileType: files.type,
@@ -67,7 +67,7 @@ export default class UploadsController {
         )
       } else {
         await Upload.updateOrCreate(
-          { fileName, userId: user.id },  // Jika folderId null
+          { fileName, userId: user.id }, // Jika folderId null
           {
             fileSize: files.size,
             fileType: files.type,

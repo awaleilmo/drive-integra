@@ -59,10 +59,13 @@ router
       .prefix('/uploads')
       .use(middleware.auth())
 
-    router.group(() => {
-      router.get('/start/file/:id', [StartController, 'toggleStarFile'])
-      router.get('/start/folder/:id', [StartController, 'toggleStarFolder'])
-    }).prefix('/start').use(middleware.auth())
+    router
+      .group(() => {
+        router.get('/start/file/:id', [StartController, 'toggleStarFile'])
+        router.get('/start/folder/:id', [StartController, 'toggleStarFolder'])
+      })
+      .prefix('/start')
+      .use(middleware.auth())
 
     router
       .group(() => {

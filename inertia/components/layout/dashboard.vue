@@ -1,33 +1,33 @@
 <script setup>
-import layout from "./app.vue";
-import { ref, onBeforeMount, onMounted, onUnmounted, computed } from "vue";
-import sideBar from "./sideBar.vue";
-import Loading from "~/components/Loading.vue";
-import DarkModeButton from "~/components/DarkModeButton.vue";
-import { useStore } from "vuex";
-import Toast from "~/components/Toast.vue";
-import MenuProgressUpload from "~/components/MenuProgressUpload.vue";
+import layout from './app.vue'
+import { ref, onBeforeMount, onMounted, onUnmounted, computed } from 'vue'
+import sideBar from './sideBar.vue'
+import Loading from '~/components/Loading.vue'
+import DarkModeButton from '~/components/DarkModeButton.vue'
+import { useStore } from 'vuex'
+import Toast from '~/components/Toast.vue'
+import MenuProgressUpload from '~/components/MenuProgressUpload.vue'
 
 const sidebarFn = () => {
-  side.value = !side.value;
-  localStorage.setItem("sidebar", side.value);
-};
+  side.value = !side.value
+  localStorage.setItem('sidebar', side.value)
+}
 
-const store = useStore();
+const store = useStore()
 
-const isLoading = computed(() => store.getters.isLoading);
+const isLoading = computed(() => store.getters.isLoading)
 
-const isRender = ref(false);
+const isRender = ref(false)
 
-const side = ref(false);
+const side = ref(false)
 
 onBeforeMount(() => {
-  side.value = localStorage.getItem("sidebar") === "true";
-});
+  side.value = localStorage.getItem('sidebar') === 'true'
+})
 
 onMounted(() => {
-  isRender.value = true;
-});
+  isRender.value = true
+})
 </script>
 
 <template>

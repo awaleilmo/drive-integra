@@ -105,7 +105,7 @@ watch(open, (newVal) => {
     </div>
 
     <!-- Full Screen Dropdown Overlay -->
-    <div v-show="open" class="fixed inset-0 z-40" @click="open = false"></div>
+    <div v-show="open" class="fixed inset-0 z-40 aspect-square" @click="open = false"></div>
     <div
       v-if="open"
       class="absolute z-50 mt-2"

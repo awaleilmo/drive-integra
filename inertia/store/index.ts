@@ -1,21 +1,26 @@
-import { createStore } from "vuex";
+import { createStore } from 'vuex'
 
 export default createStore({
   state: {
     isLoading: false,
     showToast: false,
-    toastMessage: "",
-    toastType: "info",
+    toastMessage: '',
+    toastType: 'info',
+    fileMultiple: [],
   },
   getters: {
     isLoading: (state: any) => state.isLoading,
     showToast: (state: any) => state.showToast,
     toastMessage: (state: any) => state.toastMessage,
     toastType: (state) => state.toastType,
+    fileMultiple: (state) => state.fileMultiple,
   },
   mutations: {
     setLoading(state: any, status: any) {
-      state.isLoading = status;
+      state.isLoading = status
+    },
+    SET_FILE_MULTIPLE(state: any, files: any) {
+      state.fileMultiple = files
     },
     SET_TOAST(state, { message, type }) {
       state.showToast = true
@@ -38,16 +43,19 @@ export default createStore({
   },
   actions: {
     showLoading({ commit }) {
-      commit("setLoading", true);
+      commit('setLoading', true)
+    },
+    setFileMultiple({ commit }, files) {
+      commit('SET_FILE_MULTIPLE', files)
     },
     hideLoading({ commit }) {
-      commit("setLoading", false);
+      commit('setLoading', false)
     },
-    triggerToast({ commit }, {message, type}) {
-      commit('SET_TOAST',{message, type})
+    triggerToast({ commit }, { message, type }) {
+      commit('SET_TOAST', { message, type })
     },
     hideToast({ commit }) {
       commit('HIDE_TOAST')
     },
   },
-});
+})

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from "vue";
 import fileManagerSvg from '~/assets/file_manager.svg'
 import FileComponent from '~/components/FileComponent.vue'
 import FloatMenu from '~/components/FloatMenu.vue'
@@ -7,6 +7,7 @@ import Layout from '~/components/layout/dashboard.vue'
 import PanelDrive from '~/components/PanelDrive.vue'
 import InfoEmpty from '~/components/InfoEmpty.vue'
 import { encrypt, decrypt } from '~/services/crypto.service.ts'
+import { useStore } from "vuex";
 
 const props = defineProps({
   folder: Object,
@@ -14,7 +15,8 @@ const props = defineProps({
   breadcrumbs: Object,
 })
 
-const files = ref([])
+const store = useStore()
+const files = computed(() => store.state.fileMultiple)
 const isDragging = ref(false)
 const fileInput = ref(null)
 
@@ -35,6 +37,7 @@ const onDrop = (event) => {
   isDragging.value = false
   const droppedFiles = Array.from(event.dataTransfer.files)
   files.value.push(...droppedFiles)
+  // store.dispatch('setFileMultiple', ...droppedFiles)
 }
 
 const onFileSelect = (event) => {
@@ -62,13 +65,15 @@ onMounted(async () => {})
       </template>
       <template #main>
         <div
-          class="w-full relative h-full overflow-y-auto"
+          class="w-full relative h-full overflow-y-auto overflow-x-hidden"
           @dragover.prevent="onDragOver"
           @dragleave="onDragLeave"
           @drop.prevent="onDrop"
         >
           <label v-if="props.folder.length > 0" class="text-base font-medium">Folder</label>
-          <div class="flex flex-wrap w-full gap-4 my-5">
+          <div
+            class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 my-5"
+          >
             <FileComponent
               v-for="(item, index) in props.folder"
               :key="index"
@@ -79,7 +84,7 @@ onMounted(async () => {})
 
           <label v-if="props.file.length > 0" class="text-base font-medium">File</label>
           <div
-            class="flex flex-row flex-wrap w-full justify-stretch gap-4 mt-5 place-content-stretch"
+            class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 mt-5"
           >
             <FileComponent
               v-for="(item, index) in props.file"

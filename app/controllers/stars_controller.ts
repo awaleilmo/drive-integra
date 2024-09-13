@@ -1,10 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import Upload from "#models/upload";
-import Folder from "#models/folder";
+import Upload from '#models/upload'
+import Folder from '#models/folder'
 
 export default class StarsController {
   async toggleStarFile({ params, auth, response }: HttpContext) {
-    const file = await Upload.query().where('id', params.id).where('userId', auth.user?.id).firstOrFail()
+    const file = await Upload.query()
+      .where('id', params.id)
+      .where('userId', auth.user?.id)
+      .firstOrFail()
     file.isStarred = !file.isStarred
     await file.save()
 
@@ -12,7 +15,10 @@ export default class StarsController {
   }
 
   async toggleStarFolder({ params, auth, response }: HttpContext) {
-    const folder = await Folder.query().where('id', params.id).where('userId', auth.user?.id).firstOrFail()
+    const folder = await Folder.query()
+      .where('id', params.id)
+      .where('userId', auth.user?.id)
+      .firstOrFail()
     folder.isStarred = !folder.isStarred
     await folder.save()
 

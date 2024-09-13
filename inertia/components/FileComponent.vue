@@ -1,10 +1,9 @@
 <template>
   <div
-    class="shadow-md dark:shadow-base-content/30 select-none bg-base-200 basis-1/6 max-w-1/8 rounded-lg hover:btn-active"
+    class="shadow-md dark:shadow-base-content/30 select-none bg-base-200 basis-1/12 rounded-lg hover:btn-active"
   >
     <div
-      class="flex justify-start items-center text-sm gap-2 px-4 py-2"
-      :class="{ tooltip: tooltipOn }"
+      class="flex justify-start items-center text-sm gap-2 px-4 py-2 tooltip"
       :data-tip="props.data.folderName || props.data.fileName"
     >
       <Iconify :icon="icons.icon" class="grow-0" :class="icons.class" height="1.5em" />
@@ -15,7 +14,7 @@
     </div>
     <div
       v-if="props.preview"
-      class="my-2 rounded-md mx-2 flex justify-center items-center  aspect-square bg-white dark:bg-white/90 dark:text-base-300"
+      class="my-2 rounded-lg mx-2 flex justify-center items-center overflow-hidden aspect-square bg-white dark:bg-white/90 dark:text-base-300"
     >
       <slot>
         <Iconify
@@ -28,7 +27,7 @@
         <img
           v-else
           :src="props.data.thumbnailPath"
-          class="grow-0 drop-shadow-lg rounded-lg w-full h-full object-top object-cover"
+          class="grow-0 drop-shadow-lg w-full h-full object-top object-cover"
           :alt="props.data.fileName"
         />
       </slot>

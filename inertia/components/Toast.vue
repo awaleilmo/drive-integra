@@ -1,11 +1,11 @@
 <script setup>
-import { computed, watch } from "vue";
-import { useStore } from "vuex";
+import { computed, watch } from 'vue'
+import { useStore } from 'vuex'
 
-const store = useStore();
+const store = useStore()
 
-const showToast = computed(() => store.state.showToast);
-const toastMessage = computed(() => store.state.toastMessage);
+const showToast = computed(() => store.state.showToast)
+const toastMessage = computed(() => store.state.toastMessage)
 const toastType = computed(() => store.getters.toastType)
 
 const toastClass = computed(() => {
@@ -33,11 +33,7 @@ watch(showToast, (newVal) => {
 </script>
 
 <template>
-  <div
-    v-if="showToast"
-    class="toast toast-start"
-    @click="hideToast"
-  >
+  <div v-if="showToast" class="toast toast-start" @click="hideToast">
     <div :class="toastClass">
       <div>
         <span>{{ toastMessage }}</span>
