@@ -91,6 +91,7 @@ const fileSaveFn = async () => {
 const fileChange = (e) => {
   fileData.value.file = e.target.files
   fileMultiple.value.push(...e.target.files)
+  active.value = false
   // store.dispatch('setFileMultiple', e.target.files)
   // fileSaveFn()
 }
@@ -143,7 +144,7 @@ onMounted(() => {
       >
         <div
           v-if="active"
-          class="menu bg-base-100 border border-base-300 py-4 my-2 dark:border-white/50 shadow-lg rounded-lg"
+          class="menu relative bg-base-100 border border-base-300 py-4 my-2 dark:border-white/50 shadow-lg rounded-lg"
         >
           <ul>
             <li @click="folderFn">

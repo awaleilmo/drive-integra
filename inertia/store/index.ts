@@ -7,6 +7,7 @@ export default createStore({
     toastMessage: '',
     toastType: 'info',
     fileMultiple: [],
+    onUpload: false,
   },
   getters: {
     isLoading: (state: any) => state.isLoading,
@@ -14,6 +15,7 @@ export default createStore({
     toastMessage: (state: any) => state.toastMessage,
     toastType: (state) => state.toastType,
     fileMultiple: (state) => state.fileMultiple,
+    onUpload: (state) => state.onUpload,
   },
   mutations: {
     setLoading(state: any, status: any) {
@@ -40,6 +42,9 @@ export default createStore({
       localStorage.removeItem('toastMessage')
       localStorage.removeItem('toastType')
     },
+    SET_ON_UPLOAD(state, status) {
+      state.onUpload = status
+    },
   },
   actions: {
     showLoading({ commit }) {
@@ -56,6 +61,9 @@ export default createStore({
     },
     hideToast({ commit }) {
       commit('HIDE_TOAST')
+    },
+    setOnUpload({ commit }, status) {
+      commit('SET_ON_UPLOAD', status)
     },
   },
 })

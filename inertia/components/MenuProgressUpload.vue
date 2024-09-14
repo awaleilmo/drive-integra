@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref, watch } from "vue";
-import {useStore} from "vuex";
+import { computed, ref, watch } from 'vue'
+import { useStore } from 'vuex'
 
 const store = useStore()
 const fileData = ref([])
@@ -10,27 +10,54 @@ const minimizeFn = () => {
   toggleMinimize.value = !toggleMinimize.value
 }
 
-const checkFile = (value) => {
+const checkFileArrayDuplicate = (val, i) => {
+  const value = store.state.fileMultiple
+  for (let j = 0; j < value.length; j++) {
+    if (i !== j) {
+      if (value[j].name === val.name) {
+        store.state.fileMultiple.splice(j, 1)
+        return true
+      }
+    }
+  }
+  return false
+}
+
+const pushFileData = (val, i) => {
+  fileData.value.push({
+    folderId: null,
+    description: '',
+    file: val,
+    loading: i === 0,
+    warning: false,
+    pending: i !== 0,
+    error: false,
+    success: false,
+    message: null,
+  })
+}
+
+const updateFile = () => {
+  const value = store.state.fileMultiple
   if (value.length > 0) {
+    fileData.value = []
     for (let i = 0; i < value.length; i++) {
-      fileData.value.push({
-        folderId: null,
-        description: '',
-        file: value[i],
-        loading: i === 0,
-        warning: false,
-        pending: i !== 0,
-        error: false,
-        success: false,
-        message: null,
-      })
+      if (i === 0) {
+        pushFileData(value[i], i)
+      } else {
+        const check = checkFileArrayDuplicate(value[i], i)
+        console.log('check', check)
+        if (!check) {
+          pushFileData(value[i], i)
+        }
+      }
     }
   }
 }
 
 watch(store.state.fileMultiple, (newVal) => {
   if (newVal.length > 0) {
-    checkFile(newVal)
+    updateFile()
   }
 })
 </script>
@@ -63,7 +90,12 @@ watch(store.state.fileMultiple, (newVal) => {
             </button>
           </div>
           <ul class="menu py-4">
-            <li v-for="(item, index) in fileData" :key="index" :data-tip="item.file['name']" class="tooltip break-words">
+            <li
+              v-for="(item, index) in fileData"
+              :key="index"
+              :data-tip="item.file['name']"
+              class="tooltip break-words"
+            >
               <div>
                 <iconify
                   icon="solar:file-send-bold-duotone"
@@ -74,10 +106,26 @@ watch(store.state.fileMultiple, (newVal) => {
                   >{{ item.file['name'] }}
                 </span>
                 <div class="ml-2 group">
-                  <iconify v-if="item.loading" icon="svg-spinners:90-ring-with-bg" class="text-info" height="1.8em" />
-                  <iconify v-if="item.pending" icon="solar:clock-circle-bold-duotone" class="text-primary" height="1.8em" />
-                  <iconify v-if="item.error" icon="solar:danger-triangle-bold" class="text-red-600" height="1.8em" />
-                  <span v-if="item.message !== null"
+                  <iconify
+                    v-if="item.loading"
+                    icon="svg-spinners:90-ring-with-bg"
+                    class="text-info"
+                    height="1.8em"
+                  />
+                  <iconify
+                    v-if="item.pending"
+                    icon="solar:clock-circle-bold-duotone"
+                    class="text-primary"
+                    height="1.8em"
+                  />
+                  <iconify
+                    v-if="item.error"
+                    icon="solar:danger-triangle-bold"
+                    class="text-red-600"
+                    height="1.8em"
+                  />
+                  <span
+                    v-if="item.message !== null"
                     class="absolute z-10 right-[10%] top-0 max-h-48 mb-40 bg-error hidden group-hover:block rounded max-w-[80%] h-auto py-2 px-3 break-words text-white"
                     >Toast sekarang bisa Toastsekarangbisatampildenganberbagaitipe</span
                   >
