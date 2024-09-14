@@ -36,6 +36,12 @@ export default class Upload extends BaseModel {
   declare isStarred: boolean
 
   @column()
+  declare sameFileCount: number
+
+  @column()
+  declare version: number
+
+  @column()
   declare description: string | null
 
   @column()

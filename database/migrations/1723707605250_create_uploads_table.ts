@@ -22,6 +22,8 @@ export default class extends BaseSchema {
       table.string('thumbnail_path', 255).nullable()
       table.text('description').nullable()
       table.boolean('is_starred').defaultTo(false)
+      table.integer('same_file_count').defaultTo(0)
+      table.integer('version').defaultTo(1)
 
       table.timestamp('opened_at').nullable()
       table.integer('opened_by').nullable()
