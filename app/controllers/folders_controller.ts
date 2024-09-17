@@ -7,7 +7,7 @@ import app from '@adonisjs/core/services/app'
 
 export default class FoldersController {
   async addFolder(ctx: HttpContext) {
-    try {
+    // try {
       const userId = ctx.auth.user?.id || 0
       let parentId = ctx.request.input('parentId', null)
       const checkParent = await Folder.find(parentId)
@@ -45,11 +45,11 @@ export default class FoldersController {
         status: false,
         message: 'Folder sudah ada',
       })
-    } catch (error) {
-      ctx.response.json({
-        status: false,
-        message: error.message,
-      })
-    }
+    // } catch (error) {
+    //   ctx.response.json({
+    //     status: false,
+    //     message: error.message,
+    //   })
+    // }
   }
 }

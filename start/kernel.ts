@@ -60,13 +60,11 @@ export const middleware = router.named({
 
 // every night at midnight
 cron.schedule('0 0 * * *', async () => {
-  console.log('Running task every minute...')
   await ClearTrash.run()
 })
 
 // every 5 minutes
-cron.schedule('*/5 * * * *', async () => {
-  console.log('Running task every 5 minutes...')
+cron.schedule('* * * * *', async () => {
   await CleanupFileService.run()
   await ThumbnailCleanupService.run()
 })

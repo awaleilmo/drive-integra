@@ -1,6 +1,8 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
+import { decrypt } from "~/services/crypto.service";
+import UploadService from "~/services/upload.service";
 
 const store = useStore()
 const fileData = ref([])
@@ -28,9 +30,9 @@ const pushFileData = (val, i) => {
     folderId: null,
     description: '',
     file: val,
-    loading: i === 0,
+    loading: false,
     warning: false,
-    pending: i !== 0,
+    pending: true,
     error: false,
     success: false,
     message: null,
@@ -53,6 +55,52 @@ const updateFile = () => {
       }
     }
   }
+}
+
+const FolderIdGet = () =>{
+  let queryString = window.location.search
+  if (queryString) {
+    const urlParams = new URLSearchParams(queryString)
+    const param = urlParams.get('folders')
+    const decryptParam = decrypt(param).split(':')
+    return decryptParam[1]
+  }
+  return null
+}
+
+const UploadFiles = async () => {
+  await store.dispatch('setOnUpload', true)
+  const value = fileData.value
+  for (let i = 0; i < value.length; i++) {
+    const formData = new FormData()
+    fileData.value[i].loading = true
+    fileData.value[i].pending = false
+    fileData.value[i].warning = false
+    fileData.value[i].error = false
+    fileData.value[i].success = false
+    fileData.value[i].message = null
+    formData.append('file', value[i].file)
+    formData.append('folderId', FolderIdGet())
+    formData.append('description', null)
+    let data = await UploadService.Uploads(formData)
+    if (data.status) {
+      fileData.value[i].loading = false
+      fileData.value[i].success = true
+      await store.dispatch('triggerToast', { message: data.message, type: 'success' })
+    } else {
+      fileData.value[i].loading = false
+      fileData.value[i].error = true
+      fileData.value[i].message = data.message
+      await store.dispatch('triggerToast', { message: data.message, type: 'error' })
+    }
+  }
+  await store.dispatch('setOnUpload', false)
+  setTimeout(async () => {
+    await store.dispatch('setFileMultiple', [])
+    fileData.value = []
+    window.location.reload()
+  }, 2000)
+
 }
 
 watch(store.state.fileMultiple, (newVal) => {
@@ -84,7 +132,7 @@ watch(store.state.fileMultiple, (newVal) => {
       >
         <div v-show="toggleMinimize" class="max-h-80 min-h-12 overflow-y-auto overflow-x-hidden">
           <div class="flex sticky justify-end px-4 py-2 w-full">
-            <button class="btn btn-success text-base-100">
+            <button class="btn btn-success text-base-100" @click="UploadFiles()">
               <iconify icon="solar:upload-square-broken" height="1.8em" />
               Upload
             </button>
@@ -124,10 +172,16 @@ watch(store.state.fileMultiple, (newVal) => {
                     class="text-red-600"
                     height="1.8em"
                   />
+                  <iconify
+                    v-if="item.success"
+                    icon="solar:check-circle-bold-duotone"
+                    class="text-success"
+                    height="1.8em"
+                  />
                   <span
                     v-if="item.message !== null"
                     class="absolute z-10 right-[10%] top-0 max-h-48 mb-40 bg-error hidden group-hover:block rounded max-w-[80%] h-auto py-2 px-3 break-words text-white"
-                    >Toast sekarang bisa Toastsekarangbisatampildenganberbagaitipe</span
+                    >{{ item.message }}</span
                   >
                 </div>
               </div>

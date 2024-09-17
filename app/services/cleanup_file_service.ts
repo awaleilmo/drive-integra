@@ -22,8 +22,8 @@ export default class CleanupFileService {
       const filesInDb = await Upload.query().select('file_name')
       const foldersInDb = await Folder.query().select('folder_name')
 
-      const fileNamesInDb = filesInDb.map((file) => file.file_name)
-      const folderNamesInDb = foldersInDb.map((folder) => folder.folder_name)
+      const fileNamesInDb = filesInDb.map((file) => file.fileName)
+      const folderNamesInDb = foldersInDb.map((folder) => folder.folderNname)
 
       // Read all items in the uploads directory
       const userDirs = await fs.readdir(uploadPath)

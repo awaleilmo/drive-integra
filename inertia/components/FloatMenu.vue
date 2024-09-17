@@ -53,7 +53,7 @@ const folderSave = async () => {
     if (data.status) {
       await store.dispatch('triggerToast', { message: data.message, type: 'success' })
       closeFolderModal()
-      // window.location.reload()
+      window.location.reload()
     } else {
       await store.dispatch('triggerToast', { message: data.message, type: 'error' })
     }
@@ -68,7 +68,6 @@ const fileSaveFn = async () => {
   await store.dispatch('showLoading')
   try {
     const formData = new FormData()
-    formData.append('id', fileData.value.id)
     formData.append('file', fileData.value.file)
     formData.append('folderId', fileData.value.folderId)
     formData.append('description', fileData.value.description)
@@ -185,6 +184,7 @@ onMounted(() => {
     </transition>
     <div
       class="btn btn-success btn-circle btn-lg ml-auto transform shadow-lg"
+      :class="store.state.onUpload ? 'btn-disabled' : ''"
       @click="active = !active"
     >
       <iconify height="3em" class="text-base-100" icon="solar:add-circle-broken" />

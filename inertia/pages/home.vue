@@ -18,7 +18,6 @@ const props = defineProps({
 const store = useStore()
 const files = computed(() => store.state.fileMultiple)
 const isDragging = ref(false)
-const fileInput = ref(null)
 
 const folderAction = async (item) => {
   let encrypts = encrypt(item.id.toString())
@@ -34,24 +33,11 @@ const onDragLeave = () => {
 }
 
 const onDrop = (event) => {
-  isDragging.value = false
-  const droppedFiles = Array.from(event.dataTransfer.files)
-  files.value.push(...droppedFiles)
-  // store.dispatch('setFileMultiple', ...droppedFiles)
-}
-
-const onFileSelect = (event) => {
-  const selectedFiles = Array.from(event.target.files)
-  files.value.push(...selectedFiles)
-}
-
-const triggerFileInput = () => {
-  fileInput.value['click']()
-}
-
-const uploadFiles = () => {
-  // Upload logic goes here
-  console.log('Files to upload:', files.value)
+  if(!store.state.onUpload) {
+    isDragging.value = false
+    const droppedFiles = Array.from(event.dataTransfer.files)
+    files.value.push(...droppedFiles)
+  }
 }
 
 onMounted(async () => {})
@@ -100,14 +86,6 @@ onMounted(async () => {})
             title="Tempat untuk semua file Anda"
             message="Tarik file Anda ke sini atau gunakan tombol '+' untuk mengupload"
           />
-
-          <div v-if="files.length" class="mt-4">
-            <h2 class="text-lg font-semibold">Selected Files:</h2>
-            <ul class="list-disc ml-4 mt-2">
-              <li v-for="(file, index) in files" :key="index">{{ file.name }}</li>
-            </ul>
-            <button class="btn btn-success mt-4" @click="uploadFiles">Upload Files</button>
-          </div>
         </div>
       </template>
     </PanelDrive>

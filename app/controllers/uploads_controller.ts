@@ -83,7 +83,7 @@ export default class UploadsController {
 
       return ctx.response.json({
         status: true,
-        message: 'File berhasil diupload',
+        message: `File " ${fileName} " berhasil diupload`,
       })
     } catch (error) {
       ctx.response.json({

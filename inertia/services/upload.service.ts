@@ -71,7 +71,7 @@ class UploadService {
     }
   }
   async Uploads(data: any) {
-    return await sysService.serviceAuth('POST', API_URL, data)
+    return await sysService.serviceAuth('POST', API_URL, data, true)
   }
 }
 
