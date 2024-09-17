@@ -53,7 +53,7 @@ const folderSave = async () => {
     if (data.status) {
       await store.dispatch('triggerToast', { message: data.message, type: 'success' })
       closeFolderModal()
-      window.location.reload()
+      // window.location.reload()
     } else {
       await store.dispatch('triggerToast', { message: data.message, type: 'error' })
     }

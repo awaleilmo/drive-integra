@@ -13,6 +13,7 @@ import server from '@adonisjs/core/services/server'
 import cron from 'node-cron'
 import ClearTrash from '../app/Tasks/ClearTrash.js'
 import CleanupFileService from '#services/cleanup_file_service'
+import ThumbnailCleanupService from '#services/thumbnail_cleanup_service'
 
 /**
  * The error handler is used to convert an exception
@@ -59,10 +60,13 @@ export const middleware = router.named({
 
 // every night at midnight
 cron.schedule('0 0 * * *', async () => {
+  console.log('Running task every minute...')
   await ClearTrash.run()
 })
 
 // every 5 minutes
 cron.schedule('*/5 * * * *', async () => {
+  console.log('Running task every 5 minutes...')
   await CleanupFileService.run()
+  await ThumbnailCleanupService.run()
 })

@@ -3,7 +3,7 @@ import Upload from '#models/upload'
 import { DateTime } from 'luxon'
 
 export default class CleanupTask {
-  public static async run() {
+  static async run() {
     const expirationDate = DateTime.now().minus({ days: 30 })
 
     const expiredTrashFolder = await Folder.query().where('deleted_at', '<', expirationDate.toISO())

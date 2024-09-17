@@ -1,117 +1,94 @@
 import Upload from '#models/upload'
 import Folder from '#models/folder'
-import fs from 'node:fs'
+import fs from 'node:fs/promises'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { dirname } from 'node:path'
+
+import { rimrafSync } from 'rimraf'
 
 export default class CleanupFileService {
   static async run() {
-    const uploadPath = path.join(
-      path.dirname(url.fileURLToPath(import.meta.url)),
-      '..',
-      '..',
-      'public',
-      'uploads'
-    )
+    try {
+      console.log('Running Cleanup File Service...')
 
-    // Fetch files and folders from the database
-    const filesInDb = await Upload.query().select('file_name')
-    const foldersInDb = await Folder.query().select('folder_name')
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const __fileName = fileURLToPath(import.meta.url)
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const __dirName = dirname(__fileName)
+      const uploadPath = path.join(__dirName, '..', '..', 'public', 'uploads')
 
-    const fileNamesInDb = filesInDb.map((file) => file.fileName)
-    const folderNamesInDb = foldersInDb.map((folder) => folder.folderName)
+      // Fetch files and folders from the database
+      const filesInDb = await Upload.query().select('file_name')
+      const foldersInDb = await Folder.query().select('folder_name')
 
-    // Read all items in the uploads directory
-    fs.readdir(uploadPath, (err, userDirs) => {
-      if (err) {
-        console.error('Error reading uploads directory:', err)
-        return
-      }
+      const fileNamesInDb = filesInDb.map((file) => file.file_name)
+      const folderNamesInDb = foldersInDb.map((folder) => folder.folder_name)
+
+      // Read all items in the uploads directory
+      const userDirs = await fs.readdir(uploadPath)
 
       // Loop through each user directory
-      userDirs.forEach((userDir) => {
+      for (const userDir of userDirs) {
         const userDirPath = path.join(uploadPath, userDir)
-        fs.stat(userDirPath, (err1, stats) => {
-          if (err1) {
-            console.error(`Error getting stats of ${userDir}:`, err1)
-            return
-          }
 
-          if (stats.isDirectory()) {
-            fs.readdir(userDirPath, (err2, items) => {
-              if (err2) {
-                console.error(`Error reading user's folder ${userDir}:`, err2)
-                return
-              }
+        const stats = await fs.stat(userDirPath)
+        if (stats.isDirectory()) {
+          const items = await fs.readdir(userDirPath)
 
-              items.forEach((item) => {
-                const itemPath = path.join(userDirPath, item)
-                fs.stat(itemPath, (err3, itemStats) => {
-                  if (err3) {
-                    console.error(`Error getting stats of ${item}:`, err2)
-                    return
-                  }
+          for (const item of items) {
+            const itemPath = path.join(userDirPath, item)
+            const itemStats = await fs.stat(itemPath)
 
-                  if (itemStats.isDirectory()) {
-                    if (!folderNamesInDb.includes(item)) {
-                      fs.readdir(itemPath, (err4, files) => {
-                        if (err4) {
-                          console.error(`Error reading folder ${item}:`, err4)
-                          return
-                        }
-
-                        files.forEach((file) => {
-                          fs.unlink(path.join(itemPath, file), (err5) => {
-                            if (err5) {
-                              console.error(`Error deleting file ${file}:`, err5)
-                            } else {
-                              console.log(`File ${file} deleted successfully`)
-                            }
-                          })
-                        })
-
-                        fs.rmdir(itemPath, (err6) => {
-                          if (err) {
-                            console.error(`Error deleting folder ${item}:`, err6)
-                          } else {
-                            console.log(`Folder ${item} deleted successfully`)
-                          }
-                        })
-                      })
-                    }
-                  } else {
-                    if (!fileNamesInDb.includes(item)) {
-                      fs.unlink(itemPath, (err7) => {
-                        if (err7) {
-                          console.error(`Error deleting file ${item}:`, err7)
-                        } else {
-                          console.log(`File ${item} deleted successfully`)
-                        }
-                      })
-                    }
+            if (itemStats.isDirectory()) {
+              // Folder case
+              if (!folderNamesInDb.includes(item)) {
+                await new Promise((resolve, reject) => {
+                  try {
+                    rimrafSync(itemPath, { glob: false })
+                    console.log(`Folder ${item} deleted successfully`)
+                    resolve()
+                  } catch (error) {
+                    console.error(`Error deleting folder ${item}:`, error)
+                    reject(error)
                   }
                 })
-              })
+              }
+            } else {
+              // File case
+              if (!fileNamesInDb.includes(item)) {
+                await new Promise((resolve, reject) => {
+                  try {
+                    rimrafSync(itemPath, { glob: false })
+                    console.log(`File ${item} deleted successfully`)
+                    resolve()
+                  } catch (error) {
+                    console.error(`Error deleting file ${item}:`, error)
+                    reject(error)
+                  }
+                })
+              }
+            }
+          }
 
-              fs.readdir(userDirPath, (err8, remainingItems) => {
-                if (err) {
-                  console.error(`Error re-reading user's folder ${userDir}:`, err8)
-                  return
-                }
-
-                if (remainingItems.length === 0) {
-                  fs.rmdir(userDirPath, (err9) => {
-                    if (err) {
-                      console.error(`Error deleting user's folder ${userDir}:`, err9)
-                    } else {
-                      console.log(`User's folder ${userDir} deleted successfully`)
-                    }
-                  })
-                }
-              })
+          // Re-read the directory to see if it's empty, then delete it
+          const remainingItems = await fs.readdir(userDirPath)
+          if (remainingItems.length === 0) {
+            await new Promise((resolve, reject) => {
+              try {
+                rimrafSync(userDirPath, { glob: false })
+                console.log(`User's folder ${userDir} deleted successfully`)
+                resolve()
+              } catch (error) {
+                console.error(`Error deleting user's folder ${userDir}:`, error)
+                reject(error)
+              }
             })
           }
-        })
-      })
-    })
+        }
+      }
+    } catch (error) {
+      console.error('An error occurred during the cleanup process:', error)
+    }
   }
 }
