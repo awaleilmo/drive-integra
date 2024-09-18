@@ -73,6 +73,9 @@ class UploadService {
   async Uploads(data: any) {
     return await sysService.serviceAuth('POST', API_URL, data, true)
   }
+  async CountDuplicate(data: any) {
+    return await sysService.serviceAuth('POST', API_URL + '/count', data)
+  }
 }
 
 export default new UploadService()

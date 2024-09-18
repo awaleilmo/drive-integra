@@ -23,7 +23,7 @@ export default class extends BaseSchema {
       table.text('description').nullable()
       table.boolean('is_starred').defaultTo(false)
       table.integer('same_file_count').defaultTo(0)
-      table.integer('version').defaultTo(1)
+      table.integer('version').defaultTo(0)
 
       table.timestamp('opened_at').nullable()
       table.integer('opened_by').nullable()

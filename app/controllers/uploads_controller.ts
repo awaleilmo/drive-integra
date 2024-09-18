@@ -92,4 +92,37 @@ export default class UploadsController {
       })
     }
   }
+  async countArrayExist(ctx: HttpContext) {
+    try {
+      const user = ctx.auth.user!
+      const dataInput = ctx.request.input('data', null)
+      const folderId = ctx.request.input('folderId', null)
+      let count = 0
+      let dataResult = []
+      if (dataInput !== null) {
+        for (const element of dataInput) {
+          const check = await Upload.query()
+            .where('file_name', element)
+            .where('user_id', user.id)
+            .where('folder_id', folderId)
+            .first()
+          if (check) {
+            count++
+            dataResult.push(check)
+          }
+        }
+      }
+      return ctx.response.json({
+        status: true,
+        message: 'Jumlah file',
+        data: dataResult,
+        count: count,
+      })
+    } catch (error) {
+      ctx.response.json({
+        status: false,
+        message: error.message,
+      })
+    }
+  }
 }
