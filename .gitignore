@@ -26,3 +26,4 @@ yarn-error.log
 /public/thumbnail/
 /public/uploads/
 /package-lock.json
+/uploads/

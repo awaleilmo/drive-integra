@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from 'vue'
 import fileManagerSvg from '~/assets/file_manager.svg'
 import FileComponent from '~/components/FileComponent.vue'
 import FloatMenu from '~/components/FloatMenu.vue'
@@ -7,7 +7,7 @@ import Layout from '~/components/layout/dashboard.vue'
 import PanelDrive from '~/components/PanelDrive.vue'
 import InfoEmpty from '~/components/InfoEmpty.vue'
 import { encrypt, decrypt } from '~/services/crypto.service.ts'
-import { useStore } from "vuex";
+import { useStore } from 'vuex'
 
 const props = defineProps({
   folder: Object,
@@ -33,7 +33,7 @@ const onDragLeave = () => {
 }
 
 const onDrop = (event) => {
-  if(!store.state.onUpload) {
+  if (!store.state.onUpload) {
     isDragging.value = false
     const droppedFiles = Array.from(event.dataTransfer.files)
     files.value.push(...droppedFiles)

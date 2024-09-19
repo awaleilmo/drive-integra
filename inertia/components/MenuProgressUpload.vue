@@ -1,41 +1,41 @@
 <script setup>
-import { computed, ref, watch } from "vue";
-import { useStore } from "vuex";
-import { decrypt } from "~/services/crypto.service";
-import uploadService from "~/services/upload.service";
-import Modal from "~/components/Modal.vue";
+import { computed, ref, watch } from 'vue'
+import { useStore } from 'vuex'
+import { decrypt } from '~/services/crypto.service'
+import uploadService from '~/services/upload.service'
+import Modal from '~/components/Modal.vue'
 
-const store = useStore();
-const fileData = ref([]);
-const toggleMinimize = ref(true);
-const replace = ref(false);
-const isDuplicate = ref(false);
+const store = useStore()
+const fileData = ref([])
+const toggleMinimize = ref(true)
+const replace = ref(true)
+const isDuplicate = ref(false)
 const modalValidateDuplicate = ref({
   open: false,
   message: '',
-});
+})
 
 const minimizeFn = () => {
-  toggleMinimize.value = !toggleMinimize.value;
-};
+  toggleMinimize.value = !toggleMinimize.value
+}
 
 const checkFileArrayDuplicate = (val, i) => {
-  const value = store.state.fileMultiple;
+  const value = store.state.fileMultiple
   for (let j = 0; j < value.length; j++) {
     if (i !== j) {
       if (value[j].name === val.name) {
-        store.state.fileMultiple.splice(j, 1);
-        return true;
+        store.state.fileMultiple.splice(j, 1)
+        return true
       }
     }
   }
-  return false;
-};
+  return false
+}
 
 const pushFileData = (val, i) => {
   fileData.value.push({
     folderId: null,
-    description: "",
+    description: '',
     file: val,
     loading: false,
     warning: false,
@@ -45,60 +45,61 @@ const pushFileData = (val, i) => {
     message: null,
     same: 0,
     version: 0,
-  });
-};
+  })
+}
 
 const validateDuplicate = async () => {
-  const value = fileData.value.map((val) => val["file"].name);
-  const check = await uploadService.CountDuplicate({ data: value, folderId: FolderIdGet() });
+  const value = fileData.value.map((val) => val['file'].name)
+  const check = await uploadService.CountDuplicate({ data: value, folderId: FolderIdGet() })
   if (check) {
     if (check.count === 0) {
       await UploadFiles()
     }
     if (check.count > 0) {
-      isDuplicate.value = true;
+      isDuplicate.value = true
       modalValidateDuplicate.value = {
         open: true,
-        message: check.count > 1 ? "Satu atau beberapa item" : check.data[0]['fileName']
-      };
+        message: check.count > 1 ? 'Satu atau beberapa item' : check.data[0]['fileName'],
+      }
     }
   }
-
-};
+}
 
 const updateFile = () => {
-  const value = store.state.fileMultiple;
+  const value = store.state.fileMultiple
   if (value.length > 0) {
-    fileData.value = [];
+    fileData.value = []
     for (let i = 0; i < value.length; i++) {
       if (i === 0) {
-        pushFileData(value[i], i);
+        pushFileData(value[i], i)
       } else {
-        const check = checkFileArrayDuplicate(value[i], i);
+        const check = checkFileArrayDuplicate(value[i], i)
         if (!check) {
-          pushFileData(value[i], i);
+          pushFileData(value[i], i)
         }
       }
     }
   }
-};
+}
 
 const FolderIdGet = () => {
-  let queryString = window.location.search;
+  let queryString = window.location.search
   if (queryString) {
-    const urlParams = new URLSearchParams(queryString);
-    const param = urlParams.get("folders");
-    const decryptParam = decrypt(param).split(":");
-    return decryptParam[1];
+    const urlParams = new URLSearchParams(queryString)
+    const param = urlParams.get('folders')
+    const decryptParam = decrypt(param).split(':')
+    return decryptParam[1]
   }
-  return null;
-};
+  return null
+}
 
 const UploadFiles = async () => {
-  await store.dispatch("setOnUpload", true);
-  const value = fileData.value;
+  await store.dispatch('setOnUpload', true)
+  const value = fileData.value
+  let err = false
   for (let i = 0; i < value.length; i++) {
     const formData = new FormData()
+    let localDup = false
     fileData.value[i].loading = true
     fileData.value[i].pending = false
     fileData.value[i].warning = false
@@ -107,42 +108,60 @@ const UploadFiles = async () => {
     fileData.value[i].message = null
     fileData.value[i].same = 0
     fileData.value[i].version = 0
-    if(isDuplicate.value){
-      const getData = await uploadService.CountDuplicate({ data: [value[i].file['name']], folderId: FolderIdGet() })
-      console.log(getData.data[0]['sameFileCount']);
-      console.log(getData.data[0]['version']);
-      const fileNameWithExt = value[i].file['name']
-      const baseName = fileNameWithExt.substring(0, fileNameWithExt.lastIndexOf('.'))
-      console.log(baseName);
+    let fileNameReplace = value[i].file['name']
+    if (isDuplicate.value) {
+      localDup = true
+      const getData = await uploadService.CountDuplicate({
+        data: [value[i].file['name']],
+        folderId: FolderIdGet(),
+      })
+      if (replace.value) {
+        fileData.value[i].version = Number.parseInt(getData.data[0]['version'].toString()) + 1
+      } else {
+        fileData.value[i].same = Number.parseInt(getData.data[0]['sameFileCount'].toString()) + 1
+        const fileNameWithExt = value[i].file['name']
+        const baseName = fileNameWithExt.substring(0, fileNameWithExt.lastIndexOf('.'))
+        fileNameReplace =
+          baseName +
+          ' ' +
+          fileData.value[i].same +
+          fileNameWithExt.substring(fileNameWithExt.lastIndexOf('.'))
+      }
     }
-    // formData.append('file', value[i].file)
-    // formData.append('folderId', FolderIdGet())
-    // formData.append('description', null)
-    // let data = await uploadService.Uploads(formData)
-    // if (data.status) {
-    //   fileData.value[i].loading = false
-    //   fileData.value[i].success = true
-    //   await store.dispatch('triggerToast', { message: data.message, type: 'success' })
-    // } else {
-    //   fileData.value[i].loading = false
-    //   fileData.value[i].error = true
-    //   fileData.value[i].message = data.message
-    //   await store.dispatch('triggerToast', { message: data.message, type: 'error' })
-    // }
+    formData.append('file', value[i].file)
+    formData.append('folderId', FolderIdGet())
+    formData.append('description', null)
+    formData.append('fileName', fileNameReplace)
+    formData.append('replace', replace.value)
+    formData.append('isDuplicate', localDup)
+    let data = await uploadService.Uploads(formData)
+    if (data.status) {
+      fileData.value[i].loading = false
+      fileData.value[i].success = true
+      await store.dispatch('triggerToast', { message: data.message, type: 'success' })
+    } else {
+      fileData.value[i].loading = false
+      fileData.value[i].error = true
+      fileData.value[i].message = data.message
+      err = true
+      await store.dispatch('triggerToast', { message: data.message, type: 'error' })
+    }
   }
-  // await store.dispatch('setOnUpload', false)
-  // setTimeout(async () => {
-  //   await store.dispatch('setFileMultiple', [])
-  //   fileData.value = []
-    // window.location.reload()
-  // }, 2000)
-};
+  if (!err) {
+    await store.dispatch('setOnUpload', false)
+    setTimeout(async () => {
+      await store.dispatch('setFileMultiple', [])
+      fileData.value = []
+      window.location.reload()
+    }, 2000)
+  }
+}
 
 watch(store.state.fileMultiple, (newVal) => {
   if (newVal.length > 0) {
-    updateFile();
+    updateFile()
   }
-});
+})
 </script>
 
 <template>
@@ -155,7 +174,7 @@ watch(store.state.fileMultiple, (newVal) => {
         class="btn border-0 btn-sm m-0 w-full rounded-t-2xl rounded-b-none bg-orange-200 overflow-y-auto text-center text-orange-600 dark:bg-blue-600/50 dark:text-blue-400 cursor-pointer"
         @click="minimizeFn"
       >
-        klik untuk {{ toggleMinimize ? "minimize" : "maximize" }}
+        klik untuk {{ toggleMinimize ? 'minimize' : 'maximize' }}
       </div>
       <transition
         enter-active-class="ease-in duration-500"
@@ -186,7 +205,7 @@ watch(store.state.fileMultiple, (newVal) => {
                   height="1.8em"
                 />
                 <span class="text-sm font-medium truncate max-w-2xl min-w-24"
-                >{{ item.file["name"] }}
+                  >{{ item.file['name'] }}
                 </span>
                 <div class="ml-2 group">
                   <iconify
@@ -216,7 +235,7 @@ watch(store.state.fileMultiple, (newVal) => {
                   <span
                     v-if="item.message !== null"
                     class="absolute z-10 right-[10%] top-0 max-h-48 mb-40 bg-error hidden group-hover:block rounded max-w-[80%] h-auto py-2 px-3 break-words text-white"
-                  >{{ item.message }}</span
+                    >{{ item.message }}</span
                   >
                 </div>
               </div>
@@ -230,19 +249,36 @@ watch(store.state.fileMultiple, (newVal) => {
     <div class="card bg-base-100 w-full shadow-xl">
       <div class="card-body">
         <h1 class="card-title">Opsi Upload</h1>
-        <p>{{ modalValidateDuplicate.message }} sudah ada di lokasi ini, Apakah Anda ingin mengganti file yang ada dengan versi baru atau
-          menyimpan kedua file? Mengganti file tidak akan merubah settingan berbagi.</p>
+        <p>
+          {{ modalValidateDuplicate.message }} sudah ada di lokasi ini, Apakah Anda ingin mengganti
+          file yang ada dengan versi baru atau menyimpan kedua file? Mengganti file tidak akan
+          merubah settingan berbagi.
+        </p>
         <div class="flex mt-4 w-full flex-col mx-4">
           <div class="form-control w-1/3">
             <label class="label cursor-pointer">
               <span class="label-text">Ganti file yang ada</span>
-              <input type="radio" name="radio-10" class="radio checked:bg-red-500" :checked="replace" />
+              <input
+                v-model="replace"
+                type="radio"
+                :value="true"
+                name="radio-10"
+                class="radio checked:bg-red-500"
+                :checked="replace"
+              />
             </label>
           </div>
           <div class="form-control w-1/3">
             <label class="label cursor-pointer">
               <span class="label-text">Simpan kedua file</span>
-              <input type="radio" name="radio-10" class="radio checked:bg-blue-500" :checked="!replace" />
+              <input
+                v-model="replace"
+                type="radio"
+                :value="false"
+                name="radio-10"
+                class="radio checked:bg-blue-500"
+                :checked="!replace"
+              />
             </label>
           </div>
         </div>

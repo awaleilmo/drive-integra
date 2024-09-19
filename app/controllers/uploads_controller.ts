@@ -2,8 +2,12 @@ import Folder from '#models/folder'
 import Upload from '#models/upload'
 import { decrypt } from '#services/encryption_service'
 import type { HttpContext } from '@adonisjs/core/http'
+import db from '@adonisjs/lucid/services/db'
 import app from '@adonisjs/core/services/app'
 import sharp from 'sharp'
+import drive from '@adonisjs/drive/services/main'
+import { rimrafSync } from 'rimraf'
+import {c} from "vite/dist/node/types.d-aGj9QkWt.js";
 
 export default class UploadsController {
   async store(ctx: HttpContext) {
@@ -14,6 +18,8 @@ export default class UploadsController {
       const files = ctx.request.file('file')
       let folderId = ctx.request.input('folderId', null)
       let folderPath = `uploads/${user.id}`
+      const replace = ctx.request.input('replace', false) as boolean
+      const isDuplicate = ctx.request.input('isDuplicate', false) as boolean
 
       if (folderId && folderId !== 'null' && folderId !== '') {
         const decryptId = decrypt(ctx.request.input('folderId'))
@@ -23,32 +29,37 @@ export default class UploadsController {
         folderPath = checkFolder.folderPath
       }
 
-      const fileName = `${files.clientName}`
-      const filePath = `${folderPath}/${fileName}`
-      const thumbnailPath = `thumbnail/${user.id + 'sdf' + fileName}`
+      const fileName = ctx.request.input('fileName', '')
+      const fileRaw = Date.now() + files.clientName
+      const filePath = `${folderPath}/${fileRaw}`
+      const thumbnailPath = `uploads/thumbnail/${user.id + 'sdf' + fileRaw}`
 
-      await files.move(app.publicPath(folderPath), {
-        name: fileName,
-        overwrite: true,
-      })
-
-      if (files.type === 'image') {
-        if (files.extname === 'svg') {
-          await sharp(app.publicPath(folderPath + '/' + fileName)).toFile(
-            app.publicPath(thumbnailPath)
-          )
+      if (isDuplicate) {
+        if (replace) {
+          await this.incrementVersion(folderId, files.clientName, user.id)
         } else {
-          await sharp(app.publicPath(folderPath + '/' + fileName))
-            .resize(150, 150)
-            .toFile(app.publicPath(thumbnailPath))
+          await this.incrementSameFileCount(folderId, files.clientName, user.id)
         }
       }
-
-      if (!files.isValid) {
-        return ctx.response.json({
-          status: false,
-          message: 'File gagal diupload',
+      try {
+        await files.move(app.publicPath(folderPath), {
+          name: fileRaw,
+          overwrite: true,
         })
+      } catch (error) {
+        console.log(error)
+      }
+
+      try {
+        if (files.type === 'image') {
+          if (files.extname === 'svg') {
+            await sharp(app.publicPath(filePath)).toFile(thumbnailPath)
+          } else {
+            await sharp(app.publicPath(filePath)).resize(150, 150).toFile(thumbnailPath)
+          }
+        }
+      } catch (error) {
+        console.log(error)
       }
 
       if (folderId && folderId !== 'null' && folderId !== '') {
@@ -92,6 +103,7 @@ export default class UploadsController {
       })
     }
   }
+
   async countArrayExist(ctx: HttpContext) {
     try {
       const user = ctx.auth.user!
@@ -123,6 +135,38 @@ export default class UploadsController {
         status: false,
         message: error.message,
       })
+    }
+  }
+
+  async incrementSameFileCount(folderId: number | null, fileName: string, userId: number) {
+    try {
+      const Folders = folderId && folderId !== 'null' && folderId !== '' ? folderId : null
+      const check = await Upload.query()
+        .where('file_name', fileName)
+        .where('user_id', userId)
+        .where('folder_id', Folders)
+        .first()
+      check.sameFileCount = check.sameFileCount + 1
+      check.save()
+      return true
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async incrementVersion(folderId: number | null, fileName: string, userId: number) {
+    try {
+      const Folders = folderId && folderId !== 'null' && folderId !== '' ? folderId : null
+      const check = await Upload.query()
+        .where('file_name', fileName)
+        .where('user_id', userId)
+        .where('folder_id', Folders)
+        .first()
+      check.version = check.version + 1
+      check.save()
+      return true
+    } catch (error) {
+      console.log(error)
     }
   }
 }

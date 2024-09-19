@@ -65,6 +65,6 @@ cron.schedule('0 0 * * *', async () => {
 
 // every 5 minutes
 cron.schedule('* * * * *', async () => {
-  await CleanupFileService.run()
   await ThumbnailCleanupService.run()
+  await CleanupFileService.run()
 })
