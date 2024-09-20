@@ -7,7 +7,7 @@ import app from '@adonisjs/core/services/app'
 import sharp from 'sharp'
 import drive from '@adonisjs/drive/services/main'
 import { rimrafSync } from 'rimraf'
-import {c} from "vite/dist/node/types.d-aGj9QkWt.js";
+import { c } from 'vite/dist/node/types.d-aGj9QkWt.js'
 
 export default class UploadsController {
   async store(ctx: HttpContext) {
@@ -32,7 +32,38 @@ export default class UploadsController {
       const fileName = ctx.request.input('fileName', '')
       const fileRaw = Date.now() + files.clientName
       const filePath = `${folderPath}/${fileRaw}`
-      const thumbnailPath = `uploads/thumbnail/${user.id + 'sdf' + fileRaw}`
+      const thumbnailPath = `thumbnail/${user.id + 'sdf' + fileRaw}`
+
+      try {
+        await files.move(app.publicPath(folderPath), {
+          name: fileRaw,
+          overwrite: true,
+        })
+      } catch (error) {
+        return ctx.response.json({
+          statusCode: 500,
+          status: false,
+          message: error.message,
+        })
+      }
+
+      try {
+        if (files.type === 'image') {
+          if (files.extname === 'svg') {
+            await sharp(app.publicPath(filePath)).toFile(thumbnailPath)
+          } else {
+            await sharp(app.publicPath(filePath))
+              .resize(150, 150)
+              .toFile(app.publicPath(thumbnailPath))
+          }
+        }
+      } catch (error) {
+        return ctx.response.json({
+          statusCode: 500,
+          status: false,
+          message: error.message,
+        })
+      }
 
       if (isDuplicate) {
         if (replace) {
@@ -41,63 +72,33 @@ export default class UploadsController {
           await this.incrementSameFileCount(folderId, files.clientName, user.id)
         }
       }
-      try {
-        await files.move(app.publicPath(folderPath), {
-          name: fileRaw,
-          overwrite: true,
-        })
-      } catch (error) {
-        console.log(error)
-      }
 
-      try {
-        if (files.type === 'image') {
-          if (files.extname === 'svg') {
-            await sharp(app.publicPath(filePath)).toFile(thumbnailPath)
-          } else {
-            await sharp(app.publicPath(filePath)).resize(150, 150).toFile(thumbnailPath)
-          }
+      await Upload.updateOrCreate(
+        {
+          fileName,
+          userId: user.id,
+          folderId: folderId && folderId !== 'null' && folderId !== '' ? folderId : null,
+        }, // Jika folderId tidak null
+        {
+          fileSize: files.size,
+          fileType: files.type,
+          filePath,
+          fileExt: files.extname,
+          thumbnailPath: files.type.startsWith('image') ? thumbnailPath : null,
+          description: ctx.request.input('description'),
+          createdBy: user.id,
+          updatedBy: user.id,
         }
-      } catch (error) {
-        console.log(error)
-      }
-
-      if (folderId && folderId !== 'null' && folderId !== '') {
-        await Upload.updateOrCreate(
-          { fileName, userId: user.id, folderId }, // Jika folderId tidak null
-          {
-            fileSize: files.size,
-            fileType: files.type,
-            filePath,
-            fileExt: files.extname,
-            thumbnailPath: files.type.startsWith('image') ? thumbnailPath : null,
-            description: ctx.request.input('description'),
-            createdBy: user.id,
-            updatedBy: user.id,
-          }
-        )
-      } else {
-        await Upload.updateOrCreate(
-          { fileName, userId: user.id }, // Jika folderId null
-          {
-            fileSize: files.size,
-            fileType: files.type,
-            filePath,
-            fileExt: files.extname,
-            thumbnailPath: files.type.startsWith('image') ? thumbnailPath : null,
-            description: ctx.request.input('description'),
-            createdBy: user.id,
-            updatedBy: user.id,
-          }
-        )
-      }
+      )
 
       return ctx.response.json({
+        statusCode: 200,
         status: true,
         message: `File " ${fileName} " berhasil diupload`,
       })
     } catch (error) {
       ctx.response.json({
+        statusCode: 500,
         status: false,
         message: error.message,
       })
@@ -146,7 +147,7 @@ export default class UploadsController {
         .where('user_id', userId)
         .where('folder_id', Folders)
         .first()
-      check.sameFileCount = check.sameFileCount + 1
+      check['same_file_count'] = check['same_file_count'] + 1
       check.save()
       return true
     } catch (error) {
