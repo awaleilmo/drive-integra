@@ -66,7 +66,7 @@ export default class UploadsController {
       }
 
       if (isDuplicate) {
-        if (replace) {
+        if (replace === 'true') {
           await this.incrementVersion(folderId, files.clientName, user.id)
         } else {
           await this.incrementSameFileCount(folderId, files.clientName, user.id)
@@ -147,7 +147,7 @@ export default class UploadsController {
         .where('user_id', userId)
         .where('folder_id', Folders)
         .first()
-      check['same_file_count'] = check['same_file_count'] + 1
+      check.sameFileCount = check.sameFileCount + 1
       check.save()
       return true
     } catch (error) {
@@ -169,5 +169,33 @@ export default class UploadsController {
     } catch (error) {
       console.log(error)
     }
+  }
+
+  async downloadFile(ctx: HttpContext) {
+    const user = ctx.auth.user!
+    const fileId = ctx.params.id
+    if (!fileId) {
+      return ctx.response.json({
+        statusCode: 404,
+        status: false,
+        message: 'File tidak ditemukan',
+      })
+    }
+
+    const check = await Upload.query()
+      .where('id', fileId)
+      .where('user_id', user.id)
+      .first()
+    if (!check) {
+      return ctx.response.json({
+        statusCode: 404,
+        status: false,
+        message: 'File tidak ditemukan',
+      })
+    }
+    const filePath = check.filePath
+    const path = app.publicPath(filePath)
+
+    return ctx.response.download(path)
   }
 }

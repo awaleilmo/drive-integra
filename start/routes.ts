@@ -56,6 +56,7 @@ router
       .group(() => {
         router.post('/', [UploadsController, 'store'])
         router.post('/count', [UploadsController, 'countArrayExist'])
+        router.get('/download/:id', [UploadsController, 'downloadFile'])
       })
       .prefix('/uploads')
       .use(middleware.auth())

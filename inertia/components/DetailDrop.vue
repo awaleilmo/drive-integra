@@ -1,5 +1,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
+import { useStore } from "vuex";
+import uploadService from "~/services/upload.service";
 
 const props = defineProps({
   align: {
@@ -14,7 +16,13 @@ const props = defineProps({
     type: String,
     default: 'py-1 bg-white',
   },
+  data: {
+    type: Object,
+    default: {},
+  },
 })
+
+const store = useStore()
 
 const closeOnEscape = (e) => {
   if (open.value && e.key === 'Escape') {
@@ -88,6 +96,26 @@ const adjustDropdownPosition = () => {
   dropdownBTPositionClass.value = bottom + 350 > screenHeight ? 'bottom' : 'top'
 }
 
+const downloadFn = async (fileId) => {
+  await store.dispatch('showLoading')
+  try {
+    const response = await uploadService.downloadFile(fileId)
+
+    // Membuat URL dari blob yang diunduh
+    const url = window.URL.createObjectURL(new Blob([response]))
+    const link = document.createElement('a')
+    link.href = url
+
+    link.setAttribute('download', props.data.fileName) // Nama file untuk didownload
+    document.body.appendChild(link)
+    link['click']()
+    link.remove()
+  } catch (error) {
+    await store.dispatch('triggerToast', { message: error.message, type: 'error' })
+  }
+  await store.dispatch('hideLoading')
+}
+
 watch(open, (newVal) => {
   if (newVal) {
     adjustDropdownPosition()
@@ -114,7 +142,7 @@ watch(open, (newVal) => {
     >
       <ul class="menu bg-base-200 rounded-box z-[1] w-60 p-2 shadow">
         <li>
-          <a>
+          <a @click="downloadFn(props.data.id)">
             <iconify
               icon="solar:download-bold"
               class="font-bold text-orange-400 dark:text-blue-600"
@@ -133,7 +161,7 @@ watch(open, (newVal) => {
           </a>
         </li>
         <hr class="my-2" />
-        <li>
+        <li class="disabled">
           <a>
             <iconify
               icon="solar:share-bold-duotone"
@@ -142,7 +170,7 @@ watch(open, (newVal) => {
             />Bagikan
           </a>
         </li>
-        <li class="dropdown" :class="[alignmentLRSubDropdown]">
+        <li class="dropdown disabled" :class="[alignmentLRSubDropdown]">
           <a tabindex="0" role="button">
             <iconify
               icon="solar:folder-open-bold-duotone"
@@ -184,7 +212,7 @@ watch(open, (newVal) => {
             </li>
           </ul>
         </li>
-        <li>
+        <li class="disabled">
           <a>
             <iconify
               icon="solar:info-circle-bold"

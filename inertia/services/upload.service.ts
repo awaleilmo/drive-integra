@@ -76,6 +76,16 @@ class UploadService {
   async CountDuplicate(data: any) {
     return await sysService.serviceAuth('POST', API_URL + '/count', data)
   }
+  async downloadFile(fileId) {
+    return await sysService.serviceAuth(
+      'GET',
+      API_URL + '/download/' + fileId,
+      {},
+      false,
+      [{ key: 'Content-Disposition', value: 'attachment' }],
+      'blob'
+    )
+  }
 }
 
 export default new UploadService()

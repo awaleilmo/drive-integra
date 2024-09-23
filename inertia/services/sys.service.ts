@@ -1,14 +1,16 @@
 import axios from 'axios'
 
 class SysService {
-  async serviceAuth(methods = 'GET', url = '', data = {}, multipart = false) {
+  async serviceAuth(methods = 'GET', url = '', data = {}, multipart = false, customHeaders = [], responseType = 'json') {
     return axios({
       url: url,
       method: methods,
       data: data,
       headers: {
         'Content-Type': multipart ? 'multipart/form-data' : 'application/json',
+        ...Object.fromEntries(customHeaders.map((header) => [header.key, header.value])),
       },
+      responseType: responseType,
     })
       .then((response) => {
         return response.data

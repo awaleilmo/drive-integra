@@ -64,29 +64,6 @@ const folderSave = async () => {
   }
 }
 
-const fileSaveFn = async () => {
-  await store.dispatch('showLoading')
-  try {
-    const formData = new FormData()
-    formData.append('file', fileData.value.file)
-    formData.append('folderId', fileData.value.folderId)
-    formData.append('description', fileData.value.description)
-    let data = await UploadService.Uploads(formData)
-    if (data.status) {
-      await store.dispatch('triggerToast', { message: data.message, type: 'success' })
-      closeFolderModal()
-      window.location.reload()
-    } else {
-      await store.dispatch('triggerToast', { message: data.message, type: 'error' })
-      fileData.value.file = null
-    }
-    await store.dispatch('hideLoading')
-  } catch (error) {
-    await store.dispatch('hideLoading')
-    await store.dispatch('triggerToast', { message: error.message, type: 'error' })
-  }
-}
-
 const fileChange = (e) => {
   fileData.value.file = e.target.files
   fileMultiple.value.push(...e.target.files)
@@ -168,16 +145,16 @@ onMounted(() => {
                 <span class="text-sm font-medium">Upload File</span>
               </a>
             </li>
-            <li>
-              <a>
-                <iconify
-                  icon="solar:move-to-folder-bold-duotone"
-                  class="text-orange-500 dark:text-blue-600"
-                  height="1.8em"
-                />
-                <span class="text-sm font-medium">Upload Folder</span>
-              </a>
-            </li>
+<!--            <li>-->
+<!--              <a>-->
+<!--                <iconify-->
+<!--                  icon="solar:move-to-folder-bold-duotone"-->
+<!--                  class="text-orange-500 dark:text-blue-600"-->
+<!--                  height="1.8em"-->
+<!--                />-->
+<!--                <span class="text-sm font-medium">Upload Folder</span>-->
+<!--              </a>-->
+<!--            </li>-->
           </ul>
         </div>
       </div>
