@@ -2,12 +2,8 @@ import Folder from '#models/folder'
 import Upload from '#models/upload'
 import { decrypt } from '#services/encryption_service'
 import type { HttpContext } from '@adonisjs/core/http'
-import db from '@adonisjs/lucid/services/db'
 import app from '@adonisjs/core/services/app'
 import sharp from 'sharp'
-import drive from '@adonisjs/drive/services/main'
-import { rimrafSync } from 'rimraf'
-import { c } from 'vite/dist/node/types.d-aGj9QkWt.js'
 
 export default class UploadsController {
   async store(ctx: HttpContext) {
@@ -18,7 +14,7 @@ export default class UploadsController {
       const files = ctx.request.file('file')
       let folderId = ctx.request.input('folderId', null)
       let folderPath = `uploads/${user.id}`
-      const replace = ctx.request.input('replace', false) as boolean
+      const replace = ctx.request.input('replace', false) as string
       const isDuplicate = ctx.request.input('isDuplicate', false) as boolean
 
       if (folderId && folderId !== 'null' && folderId !== '') {
@@ -80,7 +76,7 @@ export default class UploadsController {
           folderId: folderId && folderId !== 'null' && folderId !== '' ? folderId : null,
         }, // Jika folderId tidak null
         {
-          fileSize: files.size,
+          fileSize: files.size.toFixed(2),
           fileType: files.type,
           filePath,
           fileExt: files.extname,

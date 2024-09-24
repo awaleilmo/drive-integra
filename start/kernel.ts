@@ -11,6 +11,7 @@
 import router from '@adonisjs/core/services/router'
 import server from '@adonisjs/core/services/server'
 import cron from 'node-cron'
+import FolderCheckService from '#services/folder_check_service'
 import ClearTrash from '../app/Tasks/ClearTrash.js'
 import CleanupFileService from '#services/cleanup_file_service'
 import ThumbnailCleanupService from '#services/thumbnail_cleanup_service'
@@ -65,6 +66,7 @@ cron.schedule('0 0 * * *', async () => {
 
 // every 5 minutes
 cron.schedule('* * * * *', async () => {
+  await FolderCheckService.run()
   await ThumbnailCleanupService.run()
   await CleanupFileService.run()
 })
