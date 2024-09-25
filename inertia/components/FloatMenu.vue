@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watchEffect, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import FolderService from '~/services/folder.service.ts'
 import UploadService from '~/services/upload.service.ts'
@@ -11,7 +11,7 @@ const active = ref(false)
 const store = useStore()
 const folderModal = ref({
   open: false,
-  name: '',
+  name: 'Folder tanpa nama',
   path: '/',
 })
 const fileMultiple = computed(() => store.state.fileMultiple)
@@ -21,9 +21,10 @@ const fileData = ref({
   file: null,
   description: '',
 })
+const inputFolderName = ref(null)
 const pathName = ref('')
 const resetModel = () => {
-  folderModal.value.name = ''
+  folderModal.value.name = 'Folder tanpa nama'
   folderModal.value.path = '/'
   folderModal.value.open = false
 
@@ -86,6 +87,15 @@ onMounted(() => {
     const decryptParam = decrypt(param).split(':')
     FolderService.parentId = decryptParam[1]
     fileData.value.folderId = param
+  }
+})
+
+watchEffect(() => {
+  if (folderModal.value.open) {
+    nextTick(() => {
+      inputFolderName.value.focus()
+      inputFolderName.value.setSelectionRange(0, inputFolderName.value.value.length);
+    })
   }
 })
 </script>
@@ -173,11 +183,10 @@ onMounted(() => {
       <label class="text-2xl font-medium">Folder Baru</label>
       <input
         @keyup.enter="folderSave"
-        id="inputFolderName"
+        ref="inputFolderName"
         type="text"
         placeholder="Nama Folder"
         v-model="folderModal.name"
-        autofocus
         class="input input-bordered w-full mt-5"
       />
       <div class="mt-3 flex justify-end gap-4">

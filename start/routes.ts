@@ -10,7 +10,7 @@ const UsersController = () => import('#controllers/users_controller')
 const HomeController = () => import('#controllers/home_controller')
 const FoldersController = () => import('#controllers/folders_controller')
 const UploadsController = () => import('#controllers/uploads_controller')
-const StartController = () => import('#controllers/start_controller')
+const StartController = () => import('#controllers/stars_controller')
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 
@@ -57,6 +57,9 @@ router
         router.post('/', [UploadsController, 'store'])
         router.post('/count', [UploadsController, 'countArrayExist'])
         router.get('/download/:id', [UploadsController, 'downloadFile'])
+        router.post('/rename/:id', [UploadsController, 'renameFile'])
+        router.delete('/delete/:id', [UploadsController, 'deleteFile'])
+        router.post('/recovery/:id', [UploadsController, 'recoveryFile'])
       })
       .prefix('/uploads')
       .use(middleware.auth())

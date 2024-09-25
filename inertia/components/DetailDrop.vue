@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
 import { useStore } from "vuex";
 import uploadService from "~/services/upload.service";
+import RenameModal from "~/components/RenameModal.vue";
 
 const props = defineProps({
   align: {
@@ -29,6 +30,9 @@ const closeOnEscape = (e) => {
     open.value = false
   }
 }
+const rename = ref({
+  open: false,
+})
 
 onMounted(() => document.addEventListener('keydown', closeOnEscape))
 onUnmounted(() => document.removeEventListener('keydown', closeOnEscape))
@@ -101,12 +105,32 @@ const downloadFn = async (fileId) => {
   try {
     const response = await uploadService.downloadFile(fileId)
 
+    const fileRecord = props.data
+
+    if (!fileRecord) {
+      await store.dispatch('triggerToast', { message: 'File tidak ditemukan', type: 'error' })
+      return
+    }
+
+    let fileName = fileRecord.fileName;
+    const fileExt = fileRecord.fileExt;
+
+    // Cek apakah fileName memiliki ekstensi
+    if (!fileName.includes('.')) {
+      // Jika tidak ada ekstensi di fileName, tambahkan dari fileExt
+      if (fileExt) {
+        fileName = `${fileName}.${fileExt}`;
+      } else {
+        fileName = `${fileName}.txt`; // Default jika tidak ada file_ext
+      }
+    }
+
     // Membuat URL dari blob yang diunduh
     const url = window.URL.createObjectURL(new Blob([response]))
     const link = document.createElement('a')
     link.href = url
 
-    link.setAttribute('download', props.data.fileName) // Nama file untuk didownload
+    link.setAttribute('download', fileName) // Nama file untuk didownload
     document.body.appendChild(link)
     link['click']()
     link.remove()
@@ -121,6 +145,30 @@ watch(open, (newVal) => {
     adjustDropdownPosition()
   }
 })
+
+const openRenameModal = () => {
+  rename.value.open = true
+}
+
+const closeRenameModal = () => {
+  rename.value.open = false
+}
+
+const deleteFn = async () => {
+  await store.dispatch('showLoading')
+  try {
+    const data = await uploadService.deleteFile(props.data.id)
+    if (data.status) {
+      await store.dispatch('triggerToast', { message: data.message, type: 'success' })
+      window.location.reload()
+    } else {
+      await store.dispatch('triggerToast', { message: data.message, type: 'error' })
+    }
+  } catch (error) {
+    await store.dispatch('triggerToast', { message: error.message, type: 'error' })
+  }
+  await store.dispatch('hideLoading')
+}
 </script>
 
 <template>
@@ -151,7 +199,7 @@ watch(open, (newVal) => {
             Download
           </a>
         </li>
-        <li>
+        <li @click="openRenameModal">
           <a>
             <iconify
               icon="solar:pen-2-bold-duotone"
@@ -223,7 +271,7 @@ watch(open, (newVal) => {
           </a>
         </li>
         <hr class="my-2" />
-        <li>
+        <li @click="deleteFn">
           <a>
             <iconify
               icon="solar:trash-bin-trash-bold-duotone"
@@ -236,4 +284,5 @@ watch(open, (newVal) => {
       </ul>
     </div>
   </div>
+  <rename-modal :data="props.data" :show="rename.open" @close="closeRenameModal" />
 </template>

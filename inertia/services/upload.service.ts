@@ -5,7 +5,7 @@ const API_URL = '/api/uploads'
 class UploadService {
   id = 0
   user_id = 0
-  folder_id: string = 0
+  folder_id = 0
   file = null
   file_name = ''
   file_path = ''
@@ -76,15 +76,26 @@ class UploadService {
   async CountDuplicate(data: any) {
     return await sysService.serviceAuth('POST', API_URL + '/count', data)
   }
-  async downloadFile(fileId) {
+  async downloadFile(fileId: string) {
     return await sysService.serviceAuth(
       'GET',
       API_URL + '/download/' + fileId,
       {},
       false,
-      [{ key: 'Content-Disposition', value: 'attachment' }],
+      [
+        { key: 'Content-Disposition', value: 'attachment' }
+      ],
       'blob'
     )
+  }
+  async renameFile(id: string, data: any) {
+    return await sysService.serviceAuth('POST', API_URL + '/rename/' + id, data)
+  }
+  async deleteFile(id: string) {
+    return await sysService.serviceAuth('DELETE', API_URL + '/delete/' + id)
+  }
+  async recoveryFile(id: string) {
+    return await sysService.serviceAuth('POST', API_URL + '/recovery/' + id)
   }
 }
 

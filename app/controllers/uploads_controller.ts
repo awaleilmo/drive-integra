@@ -4,7 +4,8 @@ import { decrypt } from '#services/encryption_service'
 import type { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 import sharp from 'sharp'
-
+import { renameUpload } from '#validators/upload'
+import { DateTime } from 'luxon'
 export default class UploadsController {
   async store(ctx: HttpContext) {
     try {
@@ -22,16 +23,16 @@ export default class UploadsController {
         const splitDec = decryptId.split(':')
         folderId = Number.parseInt(splitDec[1])
         const checkFolder = await Folder.find(folderId)
-        folderPath = checkFolder.folderPath
+        folderPath = checkFolder!.folderPath
       }
 
       const fileName = ctx.request.input('fileName', '')
-      const fileRaw = Date.now() + files.clientName
+      const fileRaw = Date.now() + files!.clientName
       const filePath = `${folderPath}/${fileRaw}`
       const thumbnailPath = `thumbnail/${user.id + 'sdf' + fileRaw}`
 
       try {
-        await files.move(app.publicPath(folderPath), {
+        await files!.move(app.publicPath(folderPath), {
           name: fileRaw,
           overwrite: true,
         })
@@ -44,8 +45,8 @@ export default class UploadsController {
       }
 
       try {
-        if (files.type === 'image') {
-          if (files.extname === 'svg') {
+        if (files!.type === 'image') {
+          if (files!.extname === 'svg') {
             await sharp(app.publicPath(filePath)).toFile(thumbnailPath)
           } else {
             await sharp(app.publicPath(filePath))
@@ -63,9 +64,9 @@ export default class UploadsController {
 
       if (isDuplicate) {
         if (replace === 'true') {
-          await this.incrementVersion(folderId, files.clientName, user.id)
+          await this.incrementVersion(folderId, files!.clientName, user.id)
         } else {
-          await this.incrementSameFileCount(folderId, files.clientName, user.id)
+          await this.incrementSameFileCount(folderId, files!.clientName, user.id)
         }
       }
 
@@ -76,11 +77,11 @@ export default class UploadsController {
           folderId: folderId && folderId !== 'null' && folderId !== '' ? folderId : null,
         }, // Jika folderId tidak null
         {
-          fileSize: files.size.toFixed(2),
-          fileType: files.type,
+          fileSize: files!.size.toFixed(2),
+          fileType: files!.type,
           filePath,
-          fileExt: files.extname,
-          thumbnailPath: files.type.startsWith('image') ? thumbnailPath : null,
+          fileExt: files!.extname,
+          thumbnailPath: files!.type!.startsWith('image') ? thumbnailPath : null,
           description: ctx.request.input('description'),
           createdBy: user.id,
           updatedBy: user.id,
@@ -107,7 +108,7 @@ export default class UploadsController {
       const dataInput = ctx.request.input('data', null)
       const folderId = ctx.request.input('folderId', null)
       let count = 0
-      let dataResult = []
+      let dataResult: any[] = []
       if (dataInput !== null) {
         for (const element of dataInput) {
           const check = await Upload.query()
@@ -137,14 +138,15 @@ export default class UploadsController {
 
   async incrementSameFileCount(folderId: number | null, fileName: string, userId: number) {
     try {
+      // @ts-ignore
       const Folders = folderId && folderId !== 'null' && folderId !== '' ? folderId : null
       const check = await Upload.query()
         .where('file_name', fileName)
         .where('user_id', userId)
-        .where('folder_id', Folders)
+        .where('folder_id', Folders!)
         .first()
-      check.sameFileCount = check.sameFileCount + 1
-      check.save()
+      check!.sameFileCount = check!.sameFileCount + 1
+      check!.save()
       return true
     } catch (error) {
       console.log(error)
@@ -153,14 +155,15 @@ export default class UploadsController {
 
   async incrementVersion(folderId: number | null, fileName: string, userId: number) {
     try {
+      // @ts-ignore
       const Folders = folderId && folderId !== 'null' && folderId !== '' ? folderId : null
       const check = await Upload.query()
         .where('file_name', fileName)
         .where('user_id', userId)
-        .where('folder_id', Folders)
+        .where('folder_id', Folders!)
         .first()
-      check.version = check.version + 1
-      check.save()
+      check!.version = check!.version + 1
+      check!.save()
       return true
     } catch (error) {
       console.log(error)
@@ -178,10 +181,7 @@ export default class UploadsController {
       })
     }
 
-    const check = await Upload.query()
-      .where('id', fileId)
-      .where('user_id', user.id)
-      .first()
+    const check = await Upload.query().where('id', fileId).where('user_id', user.id).first()
     if (!check) {
       return ctx.response.json({
         statusCode: 404,
@@ -191,7 +191,101 @@ export default class UploadsController {
     }
     const filePath = check.filePath
     const path = app.publicPath(filePath)
-
     return ctx.response.download(path)
+  }
+
+  async renameFile(ctx: HttpContext) {
+    try{
+    const user = ctx.auth.user!
+    const fileId = ctx.params.id
+    if (!fileId) {
+      return ctx.response.json({
+        statusCode: 404,
+        status: false,
+        message: 'File tidak ditemukan',
+      })
+    }
+
+    const payload = await renameUpload.validate(ctx.request.all())
+    const check = await Upload.query().where('id', fileId).where('user_id', user.id).first()
+    if (!check) {
+      return ctx.response.json({
+        statusCode: 404,
+        status: false,
+        message: 'File tidak ditemukan',
+      })
+    }
+    check.fileName = payload.fileName?.trim() || ''
+    await check.save()
+    return ctx.response.json({
+      statusCode: 200,
+      status: true,
+      message: 'File berhasil diubah',
+    })
+    } catch (error) {
+      return ctx.response.json({
+        statusCode: 500,
+        status: false,
+        message: error.message,
+      })
+    }
+  }
+
+  async deleteFile(ctx: HttpContext) {
+    const fileId = ctx.params.id
+    if (!fileId) {
+      return ctx.response.json({
+        statusCode: 404,
+        status: false,
+        message: 'File tidak ditemukan',
+      })
+    }
+
+    const check = await Upload.query().where('id', fileId).first()
+    if (!check) {
+      return ctx.response.json({
+        statusCode: 404,
+        status: false,
+        message: 'File tidak ditemukan',
+      })
+    }
+
+    check.deletedAt = DateTime.now()
+    await check.save()
+
+    return ctx.response.json({
+      statusCode: 200,
+      status: true,
+      message: 'File berhasil dihapus',
+    })
+  }
+
+  async recoveryFile(ctx: HttpContext) {
+    const fileId = ctx.params.id
+    if (!fileId) {
+      return ctx.response.json({
+        statusCode: 404,
+        status: false,
+        message: 'File tidak ditemukan',
+      })
+    }
+
+    const check = await Upload.query().where('id', fileId).first()
+    if (!check) {
+      return ctx.response.json({
+        statusCode: 404,
+        status: false,
+        message: 'File tidak ditemukan',
+      })
+    }
+
+    check.deletedAt = null
+    await check.save()
+
+    return ctx.response.json({
+      statusCode: 200,
+      status: true,
+      message: 'File berhasil dikembalikan',
+    })
   }
 }

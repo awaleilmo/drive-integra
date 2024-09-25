@@ -30,7 +30,7 @@ export default class Upload extends BaseModel {
   declare fileExt: string
 
   @column()
-  declare thumbnailPath: string
+  declare thumbnailPath: string | null
 
   @column()
   declare isStarred: boolean
@@ -61,6 +61,9 @@ export default class Upload extends BaseModel {
 
   @column()
   declare updatedBy: number
+
+  @column()
+  declare deletedAt: DateTime | null
 
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>

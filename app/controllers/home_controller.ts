@@ -22,9 +22,10 @@ export default class HomeController {
     const folderData = await Folder.query()
       .where('user_id', userId)
       .where('parentId', folderId)
+      .whereNull('deleted_at')
       .withCount('uploads')
       .preload('uploads')
-    const fileData = await Upload.query().where('user_id', userId).where('folderId', folderId)
+    const fileData = await Upload.query().where('user_id', userId).where('folderId', folderId).whereNull('deleted_at')
     return ctx.inertia.render('home', {
       auth: ctx.auth.user,
       folder: () => folderData,
