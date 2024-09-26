@@ -59,6 +59,15 @@ class FolderService {
   async addFolder() {
     return await sysService.serviceAuth('POST', API_URL + '/add', this.data())
   }
+  async renameFolder(id: number, data: any) {
+    return await sysService.serviceAuth('POST', API_URL + '/rename/' + id, data)
+  }
+  async deleteFolder(id) {
+    return await sysService.serviceAuth('DELETE', API_URL + '/delete/' + id)
+  }
+  async recoveryFolder(id) {
+    return await sysService.serviceAuth('POST', API_URL + '/recovery/' + id)
+  }
 }
 
 export default new FolderService()

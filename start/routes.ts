@@ -48,6 +48,9 @@ router
     router
       .group(() => {
         router.post('/add', [FoldersController, 'addFolder'])
+        router.post('/rename/:id', [FoldersController, 'renameFolder'])
+        router.delete('/delete/:id', [FoldersController, 'deleteFolder'])
+        router.post('/recovery/:id', [FoldersController, 'recoveryFolder'])
       })
       .prefix('/folder')
       .use(middleware.auth())

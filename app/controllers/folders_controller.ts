@@ -1,9 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import { addFolder } from '#validators/folder'
+import { addFolder, renameFolder } from '#validators/folder'
 import Folder from '#models/folder'
 import fs from 'node:fs'
 import path from 'node:path'
 import app from '@adonisjs/core/services/app'
+import { DateTime } from 'luxon'
 
 export default class FoldersController {
   async addFolder(ctx: HttpContext) {
@@ -63,7 +64,7 @@ export default class FoldersController {
           message: 'Folder tidak ditemukan',
         })
       }
-      const payload = await addFolder.validate(ctx.request.all())
+      const payload = await renameFolder.validate(ctx.request.all())
       const check = await Folder.query().where('id', folderId).where('user_id', user.id).first()
       if (!check) {
         return ctx.response.json({
@@ -71,12 +72,73 @@ export default class FoldersController {
           message: 'Folder tidak ditemukan',
         })
       }
-      check.folderName = payload.folderName
+      check.folderName = payload.name?.trim() || ''
       check.updatedBy = user.id
       await check.save()
       return ctx.response.json({
         status: true,
         message: 'Folder berhasil diubah',
+      })
+    } catch (error) {
+      ctx.response.json({
+        status: false,
+        message: error.message,
+      })
+    }
+  }
+
+  async deleteFolder(ctx: HttpContext) {
+    try {
+      const folderId = ctx.params.id
+      if (!folderId) {
+        return ctx.response.json({
+          status: false,
+          message: 'Folder tidak ditemukan',
+        })
+      }
+      const check = await Folder.query().where('id', folderId).first()
+      if (!check) {
+        return ctx.response.json({
+          status: false,
+          message: 'Folder tidak ditemukan',
+        })
+      }
+      check.deletedAt = DateTime.now()
+      await check.save()
+      return ctx.response.json({
+        status: true,
+        message: 'Folder berhasil dihapus',
+      })
+    } catch (error) {
+      ctx.response.json({
+        status: false,
+        message: error.message,
+      })
+    }
+  }
+
+  async recoveryFolder(ctx: HttpContext) {
+    try {
+      const user = ctx.auth.user!
+      const folderId = ctx.params.id
+      if (!folderId) {
+        return ctx.response.json({
+          status: false,
+          message: 'Folder tidak ditemukan',
+        })
+      }
+      const check = await Folder.query().where('id', folderId).where('user_id', user.id).first()
+      if (!check) {
+        return ctx.response.json({
+          status: false,
+          message: 'Folder tidak ditemukan',
+        })
+      }
+      check.deletedAt = null
+      await check.save()
+      return ctx.response.json({
+        status: true,
+        message: 'Folder berhasil dikembalikan',
       })
     } catch (error) {
       ctx.response.json({

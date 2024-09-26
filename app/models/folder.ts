@@ -42,6 +42,9 @@ export default class Folder extends BaseModel {
   @column()
   declare updatedBy: number
 
+  @column()
+  declare deletedAt: DateTime | null
+
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
 

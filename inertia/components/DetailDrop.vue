@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
 import { useStore } from "vuex";
 import uploadService from "~/services/upload.service";
 import RenameModal from "~/components/RenameModal.vue";
+import folderService from "~/services/folder.service";
 
 const props = defineProps({
   align: {
@@ -161,7 +162,7 @@ const closeRenameModal = () => {
 const deleteFn = async () => {
   await store.dispatch('showLoading')
   try {
-    const data = await uploadService.deleteFile(props.data.id)
+    const data = props.isFile ? await uploadService.deleteFile(props.data.id) : await folderService.deleteFolder(props.data.id)
     if (data.status) {
       await store.dispatch('triggerToast', { message: data.message, type: 'success' })
       window.location.reload()

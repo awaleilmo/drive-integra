@@ -216,7 +216,7 @@ export default class UploadsController {
           message: 'File tidak ditemukan',
         })
       }
-      check.fileName = payload.fileName?.trim() || ''
+      check.fileName = payload.name?.trim() || ''
       check.updatedBy = user.id
       await check.save()
       return ctx.response.json({

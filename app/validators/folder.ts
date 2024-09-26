@@ -7,4 +7,28 @@ export const addFolder = vine.compile(
   })
 )
 
+export const renameFolder = vine.compile(
+  vine.object({
+    name: vine.string().trim(),
+  })
+)
+
+export const deleteFolder = vine.compile(
+  vine.object({
+    id: vine.string().trim(),
+  })
+)
+
+export const recoveryFolder = vine.compile(
+  vine.object({
+    id: vine.string().trim(),
+  })
+)
+
+renameFolder.errorReporter = () => new JSONAPIErrorReporter()
+
+deleteFolder.errorReporter = () => new JSONAPIErrorReporter()
+
+recoveryFolder.errorReporter = () => new JSONAPIErrorReporter()
+
 addFolder.errorReporter = () => new JSONAPIErrorReporter()

@@ -3,6 +3,7 @@ import { computed, ref, watchEffect, nextTick } from 'vue'
 import Modal from './Modal.vue'
 import { useStore } from 'vuex'
 import UploadService from '~/services/upload.service'
+import FolderService from "~/services/folder.service";
 
 const props = defineProps({
   show: {
@@ -26,7 +27,7 @@ const store = useStore()
 
 const form = computed(() => {
   return {
-    fileName: props.data.folderName || props.data.fileName,
+    name: props.data.folderName || props.data.fileName,
   }
 })
 
@@ -44,7 +45,7 @@ const save = async () => {
     await store.dispatch('showLoading')
 
     try {
-        const data = await UploadService.renameFile(props.data.id, form.value)
+        const data = props.isFile ? await UploadService.renameFile(props.data.id, form.value) : await FolderService.renameFolder(props.data.id, form.value)
         if (data.status) {
             await store.dispatch('triggerToast', { message: data.message, type: 'success' })
             closeModal()
@@ -73,11 +74,12 @@ watchEffect(() => {
     <div class="py-6 px-6 form-control">
       <label class="text-2xl font-medium">Ganti nama</label>
       <input
+        @keyup.enter="save"
         ref="inputField"
         type="text"
         placeholder="ganti nama"
         class="input input-bordered w-full mt-5"
-        v-model="form.fileName"
+        v-model="form.name"
       />
       <div class="mt-3 flex justify-end gap-4">
         <div @click="save" class="btn btn-sm btn-ghost text-success">Simpan</div>
