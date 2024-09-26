@@ -10,7 +10,7 @@
       <div class="grow text-left w-28 truncate">
         {{ props.data.folderName || props.data.fileName }}
       </div>
-      <DetailDrop :data="props.data" />
+      <DetailDrop :data="props.data" :isFile="props.preview" />
     </div>
     <div
       v-if="props.preview"

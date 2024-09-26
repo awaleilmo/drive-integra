@@ -82,9 +82,7 @@ class UploadService {
       API_URL + '/download/' + fileId,
       {},
       false,
-      [
-        { key: 'Content-Disposition', value: 'attachment' }
-      ],
+      [{ key: 'Content-Disposition', value: 'attachment' }],
       'blob'
     )
   }

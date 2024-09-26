@@ -21,6 +21,10 @@ const props = defineProps({
     type: Object,
     default: {},
   },
+  isFile: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const store = useStore()
@@ -189,7 +193,7 @@ const deleteFn = async () => {
       :class="[widthClass, alignmentLRClasses, alignmentTBClasses]"
     >
       <ul class="menu bg-base-200 rounded-box z-[1] w-60 p-2 shadow">
-        <li>
+        <li v-if="isFile">
           <a @click="downloadFn(props.data.id)">
             <iconify
               icon="solar:download-bold"
@@ -284,5 +288,5 @@ const deleteFn = async () => {
       </ul>
     </div>
   </div>
-  <rename-modal :data="props.data" :show="rename.open" @close="closeRenameModal" />
+  <rename-modal :data="props.data" :show="rename.open" @close="closeRenameModal" :isFile="isFile" />
 </template>

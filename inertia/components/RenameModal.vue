@@ -17,12 +17,16 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  isFile: {
+    type: Boolean,
+    default: false,
+  }
 })
 const store = useStore()
 
 const form = computed(() => {
   return {
-    fileName: props.data.fileName,
+    fileName: props.data.folderName || props.data.fileName,
   }
 })
 
