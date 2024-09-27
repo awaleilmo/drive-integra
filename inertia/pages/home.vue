@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import fileManagerSvg from '~/assets/file_manager.svg'
 import FileComponent from '~/components/FileComponent.vue'
 import FloatMenu from '~/components/FloatMenu.vue'
@@ -12,13 +12,14 @@ import uploadService from '~/services/upload.service'
 
 const props = defineProps({
   folder: Object,
-  file: Object,
   breadcrumbs: Object,
 })
 
 const store = useStore()
 const files = computed(() => store.state.fileMultiple)
 const isDragging = ref(false)
+const isLoadFile = computed(() => store.state.loadFile)
+const isFileData = ref([])
 
 const folderAction = async (item) => {
   let encrypts = encrypt(item.id.toString())
@@ -52,15 +53,26 @@ const onDrop = (event) => {
 
 const getFile = async () => {
   try {
-    let data = await uploadService.getFile(getFolderId())
-    console.log(data)
+    let result = await uploadService.getFile(getFolderId())
+    return result.data
   } catch (error) {
-    console.log(error)
+    return []
   }
 }
 
+watch(isLoadFile, async (newVal) => {
+  if (newVal) {
+    await getFile().then((data) => {
+      isFileData.value = data
+    })
+    setTimeout(async () => {
+      await store.dispatch('setLoadFile', false)
+    }, 1000)
+  }
+})
+
 onMounted(async () => {
-  await getFile()
+  await store.dispatch('setLoadFile', true)
 })
 </script>
 
@@ -89,12 +101,12 @@ onMounted(async () => {
             />
           </div>
 
-          <label v-if="props.file.length > 0" class="text-base font-medium">File</label>
+          <label v-if="isFileData.length > 0" class="text-base font-medium">File</label>
           <div
             class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 mt-5"
           >
             <FileComponent
-              v-for="(item, index) in props.file"
+              v-for="(item, index) in isFileData"
               :key="index"
               :data="item"
               :preview="true"
@@ -102,7 +114,7 @@ onMounted(async () => {
           </div>
 
           <info-empty
-            :show="props.folder.length === 0 && props.file.length === 0"
+            :show="props.folder.length === 0 && isFileData.length === 0"
             :src="fileManagerSvg"
             title="Tempat untuk semua file Anda"
             message="Tarik file Anda ke sini atau gunakan tombol '+' untuk mengupload"

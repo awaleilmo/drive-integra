@@ -151,7 +151,11 @@ const UploadFiles = async () => {
     setTimeout(async () => {
       await store.dispatch('setFileMultiple', [])
       fileData.value = []
-      window.location.reload()
+      modalValidateDuplicate.value = {
+        open: false,
+        message: null,
+      }
+      await store.dispatch('setLoadFile', true)
     }, 2000)
   }
 }

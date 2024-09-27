@@ -25,14 +25,9 @@ export default class HomeController {
       .whereNull('deleted_at')
       .withCount('uploads')
       .preload('uploads')
-    const fileData = await Upload.query()
-      .where('user_id', userId)
-      .where('folderId', folderId)
-      .whereNull('deleted_at')
     return ctx.inertia.render('home', {
       auth: ctx.auth.user,
       folder: () => folderData,
-      file: () => fileData,
       breadcrumbs: () => breadcrumbs,
     })
   }

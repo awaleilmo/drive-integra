@@ -13,12 +13,15 @@ export default class UploadsController {
       const user = ctx.auth.user!
       // const payload = await addUpload.validate(ctx.request.all)
       const files = ctx.request.file('file')
-      let folderId = ctx.request.input('folderId', null)
+      let folderId = ctx.request.input('folders', null)
+      if (folderId === 'null') {
+        folderId = null
+      }
       let folderPath = `uploads/${user.id}`
-      const replace = ctx.request.input('replace', false) as string
-      const isDuplicate = ctx.request.input('isDuplicate', false) as boolean
+      const replace = ctx.request.input('replace', 'false') === ('true' as boolean)
+      const isDuplicate = ctx.request.input('isDuplicate', 'false') === ('true' as boolean)
 
-      if (folderId && folderId !== 'null' && folderId !== '') {
+      if (folderId) {
         const decryptId = decrypt(folderId)
         const splitDec = decryptId.split(':')
         folderId = Number.parseInt(splitDec[1])
@@ -327,13 +330,10 @@ export default class UploadsController {
       }
       let fileData = Upload.query().where('user_id', userId)
       if (isTrashView) {
-        console.log('masuk trash')
         fileData = await fileData.whereNotNull('deleted_at').where('folder_id', folderId)
       } else if (isAllUpdatedView) {
-        console.log('masuk all update')
         fileData = await fileData.whereNull('deleted_at').orderBy('updated_at', 'desc')
       } else {
-        console.log('masuk normal')
         fileData = await fileData.where('folder_id', folderId).whereNull('deleted_at')
       }
       return ctx.response.json({
