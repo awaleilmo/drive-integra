@@ -12,7 +12,6 @@ export default class UploadsController {
     try {
       const user = ctx.auth.user!
       // const payload = await addUpload.validate(ctx.request.all)
-
       const files = ctx.request.file('file')
       let folderId = ctx.request.input('folderId', null)
       let folderPath = `uploads/${user.id}`
@@ -20,7 +19,7 @@ export default class UploadsController {
       const isDuplicate = ctx.request.input('isDuplicate', false) as boolean
 
       if (folderId && folderId !== 'null' && folderId !== '') {
-        const decryptId = decrypt(ctx.request.input('folderId'))
+        const decryptId = decrypt(folderId)
         const splitDec = decryptId.split(':')
         folderId = Number.parseInt(splitDec[1])
         const checkFolder = await Folder.find(folderId)
@@ -93,6 +92,17 @@ export default class UploadsController {
         statusCode: 200,
         status: true,
         message: `File " ${fileName} " berhasil diupload`,
+        data: {
+          fileName,
+          fileSize: files!.size.toFixed(2),
+          fileType: files!.type,
+          filePath,
+          fileExt: files!.extname,
+          thumbnailPath: files!.type!.startsWith('image') ? thumbnailPath : null,
+          description: ctx.request.input('description'),
+          createdBy: user.id,
+          updatedBy: user.id,
+        },
       })
     } catch (error) {
       ctx.response.json({
@@ -107,7 +117,12 @@ export default class UploadsController {
     try {
       const user = ctx.auth.user!
       const dataInput = ctx.request.input('data', null)
-      const folderId = ctx.request.input('folderId', null)
+      let folderId = ctx.request.input('folderId', null)
+      if (folderId && folderId !== 'null' && folderId !== '') {
+        const decryptId = decrypt(folderId)
+        const splitDec = decryptId.split(':')
+        folderId = Number.parseInt(splitDec[1])
+      }
       let count = 0
       let dataResult: any[] = []
       if (dataInput !== null) {
@@ -289,5 +304,49 @@ export default class UploadsController {
       status: true,
       message: 'File berhasil dikembalikan',
     })
+  }
+
+  async fileView(ctx: HttpContext) {
+    try {
+      const userId = ctx.auth.user?.id || 0
+      let folderId = ctx.request.input('folders', null)
+      if (folderId === 'null') {
+        folderId = null
+      }
+      let isTrashView = ctx.request.input('isTrashView', 'false') === ('true' as boolean)
+      let isAllUpdatedView = ctx.request.input('isAllUpdateView', 'false') === ('true' as boolean)
+      let decryptId = ''
+      if (folderId !== null) {
+        decryptId = decrypt(folderId)
+        const splitDec = decryptId.split(':')
+        folderId = Number.parseInt(splitDec[1])
+      }
+      const checkFolder = await Folder.find(folderId)
+      if (!checkFolder) {
+        folderId = null
+      }
+      let fileData = Upload.query().where('user_id', userId)
+      if (isTrashView) {
+        console.log('masuk trash')
+        fileData = await fileData.whereNotNull('deleted_at').where('folder_id', folderId)
+      } else if (isAllUpdatedView) {
+        console.log('masuk all update')
+        fileData = await fileData.whereNull('deleted_at').orderBy('updated_at', 'desc')
+      } else {
+        console.log('masuk normal')
+        fileData = await fileData.where('folder_id', folderId).whereNull('deleted_at')
+      }
+      return ctx.response.json({
+        statusCode: 200,
+        status: true,
+        data: fileData,
+      })
+    } catch (error) {
+      return ctx.response.json({
+        statusCode: 500,
+        status: false,
+        message: error.message,
+      })
+    }
   }
 }

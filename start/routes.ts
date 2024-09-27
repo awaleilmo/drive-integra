@@ -57,6 +57,7 @@ router
 
     router
       .group(() => {
+        router.get('/', [UploadsController, 'fileView'])
         router.post('/', [UploadsController, 'store'])
         router.post('/count', [UploadsController, 'countArrayExist'])
         router.get('/download/:id', [UploadsController, 'downloadFile'])

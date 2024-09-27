@@ -1,7 +1,6 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useStore } from 'vuex'
-import { decrypt } from '~/services/crypto.service'
 import uploadService from '~/services/upload.service'
 import Modal from '~/components/Modal.vue'
 
@@ -51,7 +50,7 @@ const pushFileData = (val, i) => {
 const validateDuplicate = async () => {
   const value = fileData.value.map((val) => val['file'].name)
   const check = await uploadService.CountDuplicate({ data: value, folderId: FolderIdGet() })
-  if (check) {
+  if (check.status) {
     if (check.count === 0) {
       await UploadFiles()
     }
@@ -62,6 +61,8 @@ const validateDuplicate = async () => {
         message: check.count > 1 ? 'Satu atau beberapa item' : check.data[0]['fileName'],
       }
     }
+  } else {
+    await store.dispatch('triggerToast', { message: check.message, type: 'error' })
   }
 }
 
@@ -86,9 +87,7 @@ const FolderIdGet = () => {
   let queryString = window.location.search
   if (queryString) {
     const urlParams = new URLSearchParams(queryString)
-    const param = urlParams.get('folders')
-    const decryptParam = decrypt(param).split(':')
-    return decryptParam[1]
+    return urlParams.get('folders')
   }
   return null
 }

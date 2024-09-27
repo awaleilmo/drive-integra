@@ -70,6 +70,22 @@ class UploadService {
       deleted_at: this.deleted_at,
     }
   }
+  async getFile(
+    folders: string | null = null,
+    isTrashView: boolean = false,
+    isAllUpdateView: boolean = false
+  ) {
+    return await sysService.serviceAuth(
+      'GET',
+      API_URL +
+        '?folders=' +
+        folders +
+        '&isTrashView=' +
+        isTrashView +
+        '&isAllUpdateView=' +
+        isAllUpdateView
+    )
+  }
   async Uploads(data: any) {
     return await sysService.serviceAuth('POST', API_URL, data, true)
   }

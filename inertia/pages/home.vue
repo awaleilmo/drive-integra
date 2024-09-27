@@ -8,6 +8,7 @@ import PanelDrive from '~/components/PanelDrive.vue'
 import InfoEmpty from '~/components/InfoEmpty.vue'
 import { encrypt, decrypt } from '~/services/crypto.service.ts'
 import { useStore } from 'vuex'
+import uploadService from '~/services/upload.service'
 
 const props = defineProps({
   folder: Object,
@@ -22,6 +23,15 @@ const isDragging = ref(false)
 const folderAction = async (item) => {
   let encrypts = encrypt(item.id.toString())
   window.location.href = '/home?folders=' + encrypts
+}
+
+const getFolderId = () => {
+  let queryString = window.location.search
+  if (queryString) {
+    const urlParams = new URLSearchParams(queryString)
+    return urlParams.get('folders')
+  }
+  return null
 }
 
 const onDragOver = () => {
@@ -40,7 +50,18 @@ const onDrop = (event) => {
   }
 }
 
-onMounted(async () => {})
+const getFile = async () => {
+  try {
+    let data = await uploadService.getFile(getFolderId())
+    console.log(data)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+onMounted(async () => {
+  await getFile()
+})
 </script>
 
 <template>
