@@ -56,16 +56,30 @@ class FolderService {
     }
   }
 
+  async getFolder(
+    folders: string | null = null,
+    isTrashView: boolean = false,
+  ) {
+    return await sysService.serviceAuth(
+      'GET',
+      API_URL +
+        '?folders=' +
+        folders +
+        '&isTrashView=' +
+        isTrashView
+    )
+  }
   async addFolder() {
     return await sysService.serviceAuth('POST', API_URL + '/add', this.data())
   }
   async renameFolder(id: number, data: any) {
     return await sysService.serviceAuth('POST', API_URL + '/rename/' + id, data)
   }
-  async deleteFolder(id) {
+
+  async deleteFolder(id: number) {
     return await sysService.serviceAuth('DELETE', API_URL + '/delete/' + id)
   }
-  async recoveryFolder(id) {
+  async recoveryFolder(id: number) {
     return await sysService.serviceAuth('POST', API_URL + '/recovery/' + id)
   }
 }

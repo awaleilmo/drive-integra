@@ -18,8 +18,8 @@ export default class UploadsController {
         folderId = null
       }
       let folderPath = `uploads/${user.id}`
-      const replace = ctx.request.input('replace', 'false') === ('true' as boolean)
-      const isDuplicate = ctx.request.input('isDuplicate', 'false') === ('true' as boolean)
+      const replace = ctx.request.input('replace', 'false') === 'true'
+      const isDuplicate = ctx.request.input('isDuplicate', 'false') === 'true'
 
       if (folderId) {
         const decryptId = decrypt(folderId)
@@ -66,7 +66,7 @@ export default class UploadsController {
       }
 
       if (isDuplicate) {
-        if (replace === 'true') {
+        if (replace) {
           await this.incrementVersion(folderId, files!.clientName, user.id)
         } else {
           await this.incrementSameFileCount(folderId, files!.clientName, user.id)
@@ -316,8 +316,8 @@ export default class UploadsController {
       if (folderId === 'null') {
         folderId = null
       }
-      let isTrashView = ctx.request.input('isTrashView', 'false') === ('true' as boolean)
-      let isAllUpdatedView = ctx.request.input('isAllUpdateView', 'false') === ('true' as boolean)
+      let isTrashView = ctx.request.input('isTrashView', 'false') === 'true'
+      let isAllUpdatedView = ctx.request.input('isAllUpdateView', 'false') === 'true'
       let decryptId = ''
       if (folderId !== null) {
         decryptId = decrypt(folderId)
@@ -328,7 +328,7 @@ export default class UploadsController {
       if (!checkFolder) {
         folderId = null
       }
-      let fileData = Upload.query().where('user_id', userId)
+      let fileData: any = Upload.query().where('user_id', userId)
       if (isTrashView) {
         fileData = await fileData.whereNotNull('deleted_at').where('folder_id', folderId)
       } else if (isAllUpdatedView) {

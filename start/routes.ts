@@ -47,6 +47,7 @@ router
 
     router
       .group(() => {
+        router.get('/', [FoldersController, 'folderView'])
         router.post('/add', [FoldersController, 'addFolder'])
         router.post('/rename/:id', [FoldersController, 'renameFolder'])
         router.delete('/delete/:id', [FoldersController, 'deleteFolder'])

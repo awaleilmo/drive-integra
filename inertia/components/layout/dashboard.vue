@@ -1,7 +1,7 @@
 <script setup>
 import layout from './app.vue'
 import { ref, onBeforeMount, onMounted, onUnmounted, computed } from 'vue'
-import sideBar from './sideBar.vue'
+import sideBar from '~/components/layout/sidebar.vue'
 import Loading from '~/components/Loading.vue'
 import DarkModeButton from '~/components/DarkModeButton.vue'
 import { useStore } from 'vuex'

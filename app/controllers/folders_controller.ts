@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { addFolder, renameFolder } from '#validators/folder'
+import { decrypt } from '#services/encryption_service'
 import Folder from '#models/folder'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -144,6 +145,54 @@ export default class FoldersController {
       ctx.response.json({
         status: false,
         message: error.message,
+      })
+    }
+  }
+
+  async folderView(ctx: HttpContext) {
+    try {
+      const userId = ctx.auth.user?.id || 0
+      let folderId = ctx.request.input('folders', null)
+      if (folderId === 'null') {
+        folderId = null
+      }
+      let isTrashView = ctx.request.input('isTrashView', 'false') === 'true'
+      let decryptId = ''
+      if (folderId !== null) {
+        decryptId = decrypt(folderId)
+        const splitDec = decryptId.split(':')
+        folderId = Number.parseInt(splitDec[1])
+      }
+      if (!folderId) {
+        return ctx.response.json({
+          status: false,
+          message: 'Folder tidak ditemukan',
+        })
+      }
+      const check = await Folder.query().where('id', folderId).where('user_id', userId).first()
+      if (!check) {
+        return ctx.response.json({
+          status: false,
+          message: 'Folder tidak ditemukan',
+          data: []
+        })
+      }
+      let fileData: any = Folder.query().where('user_id', userId)
+      if (isTrashView) {
+        fileData = await fileData.whereNotNull('deleted_at').where('folder_id', folderId)
+      } else {
+        fileData = await fileData.where('folder_id', folderId).whereNull('deleted_at')
+      }
+      return ctx.response.json({
+        status: true,
+        message: 'Folder ditemukan',
+        data: fileData,
+      })
+    } catch (error) {
+      ctx.response.json({
+        status: false,
+        message: error.message,
+        data: []
       })
     }
   }
