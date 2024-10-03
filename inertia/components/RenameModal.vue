@@ -49,7 +49,7 @@ const save = async () => {
         if (data.status) {
             await store.dispatch('triggerToast', { message: data.message, type: 'success' })
             closeModal()
-            window.location.reload()
+          await store.dispatch('setLoadFile', true)
         } else {
             await store.dispatch('triggerToast', { message: data.message, type: 'error' })
         }

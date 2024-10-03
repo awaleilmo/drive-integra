@@ -163,25 +163,22 @@ export default class FoldersController {
         const splitDec = decryptId.split(':')
         folderId = Number.parseInt(splitDec[1])
       }
-      if (!folderId) {
-        return ctx.response.json({
-          status: false,
-          message: 'Folder tidak ditemukan',
-        })
-      }
-      const check = await Folder.query().where('id', folderId).where('user_id', userId).first()
+      const check = await Folder.query()
+        .where('parent_id', folderId)
+        .where('user_id', userId)
+        .first()
       if (!check) {
         return ctx.response.json({
           status: false,
           message: 'Folder tidak ditemukan',
-          data: []
+          data: [],
         })
       }
       let fileData: any = Folder.query().where('user_id', userId)
       if (isTrashView) {
-        fileData = await fileData.whereNotNull('deleted_at').where('folder_id', folderId)
+        fileData = await fileData.whereNotNull('deleted_at')
       } else {
-        fileData = await fileData.where('folder_id', folderId).whereNull('deleted_at')
+        fileData = await fileData.where('parent_id', folderId).whereNull('deleted_at')
       }
       return ctx.response.json({
         status: true,
@@ -192,7 +189,7 @@ export default class FoldersController {
       ctx.response.json({
         status: false,
         message: error.message,
-        data: []
+        data: [],
       })
     }
   }

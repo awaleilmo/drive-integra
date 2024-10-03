@@ -6,7 +6,6 @@ import { decrypt } from '#services/encryption_service'
 
 export default class HomeController {
   async home(ctx: HttpContext) {
-    const userId = ctx.auth.user?.id || 0
     let folderId = ctx.request.input('folders', null)
     let decryptId = ''
     if (folderId !== null) {
@@ -19,15 +18,8 @@ export default class HomeController {
       folderId = null
     }
     const breadcrumbs = await BreadcrumbsService.getBreadcrumbs(folderId)
-    const folderData = await Folder.query()
-      .where('user_id', userId)
-      .where('parentId', folderId)
-      .whereNull('deleted_at')
-      .withCount('uploads')
-      .preload('uploads')
     return ctx.inertia.render('home', {
       auth: ctx.auth.user,
-      folder: () => folderData,
       breadcrumbs: () => breadcrumbs,
     })
   }

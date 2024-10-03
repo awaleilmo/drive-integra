@@ -12,7 +12,6 @@ const changeDarkMode = () => {
   document.documentElement.setAttribute('data-theme', darkMode.value ? 'dark' : 'light')
   document.documentElement.classList.toggle('dark', darkMode.value)
   localStorage.setItem('theme', darkMode.value ? 'dark' : 'light')
-  // window.location.reload()
 }
 const checkDarkMode = () => {
   let savedTheme = localStorage.getItem('theme')

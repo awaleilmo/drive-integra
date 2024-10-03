@@ -56,17 +56,10 @@ class FolderService {
     }
   }
 
-  async getFolder(
-    folders: string | null = null,
-    isTrashView: boolean = false,
-  ) {
+  async getFolder(folders: string | null = null, isTrashView: boolean = false) {
     return await sysService.serviceAuth(
       'GET',
-      API_URL +
-        '?folders=' +
-        folders +
-        '&isTrashView=' +
-        isTrashView
+      API_URL + '?folders=' + folders + '&isTrashView=' + isTrashView
     )
   }
   async addFolder() {

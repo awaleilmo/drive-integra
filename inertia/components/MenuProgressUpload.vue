@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import {computed, ref, watchEffect} from 'vue'
 import { useStore } from 'vuex'
 import uploadService from '~/services/upload.service'
 import Modal from '~/components/Modal.vue'
@@ -114,9 +114,7 @@ const UploadFiles = async () => {
         data: [value[i].file['name']],
         folderId: FolderIdGet(),
       })
-      if (replace.value) {
-        fileData.value[i].version = Number.parseInt(getData.data[0]['version'].toString()) + 1
-      } else {
+      if (!replace.value) {
         fileData.value[i].same = Number.parseInt(getData.data[0]['sameFileCount'].toString()) + 1
         const fileNameWithExt = value[i].file['name']
         const baseName = fileNameWithExt.substring(0, fileNameWithExt.lastIndexOf('.'))
@@ -147,6 +145,7 @@ const UploadFiles = async () => {
     }
   }
   if (!err) {
+    await store.dispatch('setLoadFile', true)
     await store.dispatch('setOnUpload', false)
     setTimeout(async () => {
       await store.dispatch('setFileMultiple', [])
@@ -155,14 +154,14 @@ const UploadFiles = async () => {
         open: false,
         message: null,
       }
-      await store.dispatch('setLoadFile', true)
     }, 2000)
   }
 }
 
-watch(store.state.fileMultiple, (newVal) => {
-  if (newVal.length > 0) {
-    updateFile()
+watchEffect(() => {
+  const files = store.state.fileMultiple;
+  if (files.length > 0) {
+    updateFile();
   }
 })
 </script>

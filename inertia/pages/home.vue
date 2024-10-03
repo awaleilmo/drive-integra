@@ -6,12 +6,12 @@ import FloatMenu from '~/components/FloatMenu.vue'
 import Layout from '~/components/layout/dashboard.vue'
 import PanelDrive from '~/components/PanelDrive.vue'
 import InfoEmpty from '~/components/InfoEmpty.vue'
-import { encrypt, decrypt } from '~/services/crypto.service.ts'
+import { encrypt } from '~/services/crypto.service.ts'
 import { useStore } from 'vuex'
 import uploadService from '~/services/upload.service'
+import folderService from "~/services/folder.service";
 
 const props = defineProps({
-  folder: Object,
   breadcrumbs: Object,
 })
 
@@ -20,6 +20,7 @@ const files = computed(() => store.state.fileMultiple)
 const isDragging = ref(false)
 const isLoadFile = computed(() => store.state.loadFile)
 const isFileData = ref([])
+const isFolderData = ref([])
 
 const folderAction = async (item) => {
   let encrypts = encrypt(item.id.toString())
@@ -60,10 +61,23 @@ const getFile = async () => {
   }
 }
 
+const getFolder = async () => {
+  try {
+    let result = await folderService.getFolder(getFolderId())
+    return result.data
+  } catch (error) {
+    return []
+  }
+}
+
 watch(isLoadFile, async (newVal) => {
   if (newVal) {
     await getFile().then((data) => {
       isFileData.value = data
+    })
+
+    await getFolder().then((data) => {
+      isFolderData.value = data
     })
     setTimeout(async () => {
       await store.dispatch('setLoadFile', false)
@@ -89,12 +103,12 @@ onMounted(async () => {
           @dragleave="onDragLeave"
           @drop.prevent="onDrop"
         >
-          <label v-if="props.folder.length > 0" class="text-base font-medium">Folder</label>
+          <label v-if="isFolderData.length > 0" class="text-base font-medium">Folder</label>
           <div
             class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 my-5"
           >
             <FileComponent
-              v-for="(item, index) in props.folder"
+              v-for="(item, index) in isFolderData"
               :key="index"
               :data="item"
               @dblclick="folderAction(item)"
@@ -114,7 +128,7 @@ onMounted(async () => {
           </div>
 
           <info-empty
-            :show="props.folder.length === 0 && isFileData.length === 0"
+            :show="isFolderData.length === 0 && isFileData.length === 0"
             :src="fileManagerSvg"
             title="Tempat untuk semua file Anda"
             message="Tarik file Anda ke sini atau gunakan tombol '+' untuk mengupload"

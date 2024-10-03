@@ -165,7 +165,7 @@ const deleteFn = async () => {
     const data = props.isFile ? await uploadService.deleteFile(props.data.id) : await folderService.deleteFolder(props.data.id)
     if (data.status) {
       await store.dispatch('triggerToast', { message: data.message, type: 'success' })
-      window.location.reload()
+      await store.dispatch('setLoadFile', true)
     } else {
       await store.dispatch('triggerToast', { message: data.message, type: 'error' })
     }

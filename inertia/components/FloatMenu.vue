@@ -2,7 +2,6 @@
 import { computed, onMounted, ref, watchEffect, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import FolderService from '~/services/folder.service.ts'
-import UploadService from '~/services/upload.service.ts'
 import Modal from '~/components/Modal.vue'
 import { decrypt } from '~/services/crypto.service'
 
@@ -53,8 +52,8 @@ const folderSave = async () => {
     let data = await FolderService.addFolder()
     if (data.status) {
       await store.dispatch('triggerToast', { message: data.message, type: 'success' })
+      await store.dispatch('setLoadFile', true)
       closeFolderModal()
-      window.location.reload()
     } else {
       await store.dispatch('triggerToast', { message: data.message, type: 'error' })
     }
