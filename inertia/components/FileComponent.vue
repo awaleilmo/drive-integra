@@ -10,7 +10,8 @@
       <div class="grow text-left w-28 truncate">
         {{ props.data.folderName || props.data.fileName }}
       </div>
-      <DetailDrop :data="props.data" :isFile="props.preview" />
+      <DetailDropTrash v-if="props.trash" :data="props.data" :isFile="props.preview" />
+      <DetailDrop v-else :data="props.data" :isFile="props.preview" />
     </div>
     <div
       v-if="props.preview"
@@ -34,18 +35,29 @@
       </slot>
     </div>
 
-    <PreviewComponent v-if="props.preview" :show="modalOpenPreview" :src="props.data.filePath"  @close="modalOpenPreview = false" :type="props.data.fileType" />
+    <PreviewComponent
+      v-if="props.preview"
+      :show="modalOpenPreview"
+      :src="props.data.filePath"
+      @close="modalOpenPreview = false"
+      :type="props.data.fileType"
+    />
   </div>
 </template>
 
 <script setup>
 import DetailDrop from '~/components/DetailDrop.vue'
-import {computed, onMounted, ref, watch} from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import sysService from '~/services/sys.service.ts'
 import PreviewComponent from '~/components/Preview.vue'
 import { useStore } from 'vuex'
+import DetailDropTrash from '~/components/DetailDropTrash.vue'
 const props = defineProps({
   preview: {
+    type: Boolean,
+    default: false,
+  },
+  trash: {
     type: Boolean,
     default: false,
   },

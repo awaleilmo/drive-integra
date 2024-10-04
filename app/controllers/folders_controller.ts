@@ -97,15 +97,16 @@ export default class FoldersController {
           message: 'Folder tidak ditemukan',
         })
       }
-      const check = await Folder.query().where('id', folderId).first()
+      const check = await Folder.findOrFail(folderId)
       if (!check) {
         return ctx.response.json({
           status: false,
           message: 'Folder tidak ditemukan',
         })
       }
-      check.deletedAt = DateTime.now()
-      await check.save()
+
+      await this.moveFolderToTrash(check)
+
       return ctx.response.json({
         status: true,
         message: 'Folder berhasil dihapus',
@@ -118,9 +119,27 @@ export default class FoldersController {
     }
   }
 
+  async moveFolderToTrash(folder: Folder) {
+    // Set `deleted_at` for the folder itself
+    folder.deletedAt = DateTime.now()
+    await folder.save()
+
+    // Get and move all files in the folder to trash
+    const files = await folder.related('uploads').query()
+    for (const file of files) {
+      file.deletedAt = DateTime.now()
+      await file.save()
+    }
+
+    // Get all subfolders and move them and their contents to trash
+    const subfolders = await folder.related('folders').query()
+    for (const subfolder of subfolders) {
+      await this.moveFolderToTrash(subfolder) // Recursive call
+    }
+  }
+
   async recoveryFolder(ctx: HttpContext) {
     try {
-      const user = ctx.auth.user!
       const folderId = ctx.params.id
       if (!folderId) {
         return ctx.response.json({
@@ -128,15 +147,14 @@ export default class FoldersController {
           message: 'Folder tidak ditemukan',
         })
       }
-      const check = await Folder.query().where('id', folderId).where('user_id', user.id).first()
+      const check = await Folder.findOrFail(folderId)
       if (!check) {
         return ctx.response.json({
           status: false,
           message: 'Folder tidak ditemukan',
         })
       }
-      check.deletedAt = null
-      await check.save()
+      await this.recoveryAllFolder(check)
       return ctx.response.json({
         status: true,
         message: 'Folder berhasil dikembalikan',
@@ -146,6 +164,25 @@ export default class FoldersController {
         status: false,
         message: error.message,
       })
+    }
+  }
+
+  async recoveryAllFolder(folder: Folder) {
+    // Set `deleted_at` for the folder itself
+    folder.deletedAt = null
+    await folder.save()
+
+    // Get and move all files in the folder to trash
+    const files = await folder.related('uploads').query()
+    for (const file of files) {
+      file.deletedAt = null
+      await file.save()
+    }
+
+    // Get all subfolders and move them and their contents to trash
+    const subfolders = await folder.related('folders').query()
+    for (const subfolder of subfolders) {
+      await this.recoveryAllFolder(subfolder) // Recursive call
     }
   }
 

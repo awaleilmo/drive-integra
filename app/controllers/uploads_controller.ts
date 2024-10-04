@@ -6,6 +6,7 @@ import app from '@adonisjs/core/services/app'
 import sharp from 'sharp'
 import { renameUpload } from '#validators/upload'
 import { DateTime } from 'luxon'
+import { rimrafSync } from 'rimraf'
 
 export default class UploadsController {
   async store(ctx: HttpContext) {
@@ -341,6 +342,42 @@ export default class UploadsController {
         statusCode: 200,
         status: true,
         data: fileData,
+      })
+    } catch (error) {
+      return ctx.response.json({
+        statusCode: 500,
+        status: false,
+        message: error.message,
+      })
+    }
+  }
+
+  async removeFileForever(ctx: HttpContext) {
+    try {
+      const userId = ctx.auth.user?.id || 0
+      let folderId = ctx.request.input('folders', null)
+      if (folderId === 'null') {
+        folderId = null
+      }
+      let decryptId = ''
+      if (folderId !== null) {
+        decryptId = decrypt(folderId)
+        const splitDec = decryptId.split(':')
+        folderId = Number.parseInt(splitDec[1])
+      }
+      const checkFolder = await Folder.find(folderId)
+      if (!checkFolder) {
+        folderId = null
+      }
+      let fileData: any = Upload.query().where('user_id', userId)
+      if (folderId !== null) {
+        fileData = fileData.where('folder_id', folderId)
+      }
+      await fileData.delete()
+      return ctx.response.json({
+        statusCode: 200,
+        status: true,
+        message: 'File berhasil dihapus',
       })
     } catch (error) {
       return ctx.response.json({
