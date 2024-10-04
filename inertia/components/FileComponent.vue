@@ -15,6 +15,7 @@
     <div
       v-if="props.preview"
       class="my-2 rounded-lg mx-2 flex justify-center items-center overflow-hidden aspect-square bg-white dark:bg-white/90 dark:text-base-300"
+      @click="modalOpenPreview = true"
     >
       <slot>
         <Iconify
@@ -32,13 +33,17 @@
         />
       </slot>
     </div>
+
+    <PreviewComponent v-if="props.preview" :show="modalOpenPreview" :src="props.data.filePath"  @close="modalOpenPreview = false" :type="props.data.fileType" />
   </div>
 </template>
 
 <script setup>
 import DetailDrop from '~/components/DetailDrop.vue'
-import { onMounted, ref } from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import sysService from '~/services/sys.service.ts'
+import PreviewComponent from '~/components/Preview.vue'
+import { useStore } from 'vuex'
 const props = defineProps({
   preview: {
     type: Boolean,
@@ -49,6 +54,9 @@ const props = defineProps({
     default: {},
   },
 })
+const store = useStore()
+const modalOpenPreview = ref(false)
+const isLoadFile = computed(() => store.state.loadFile)
 const tooltipOn = ref(false)
 const icons = ref({
   icon: 'solar:folder-bold-duotone',
@@ -81,6 +89,15 @@ onMounted(() => {
         tooltipOn.value = true
       }
     }
+  }
+})
+
+watch(isLoadFile, async (newVal) => {
+  if (newVal) {
+    await changeIcon()
+    setTimeout(async () => {
+      await store.dispatch('setLoadFile', false)
+    }, 1000)
   }
 })
 </script>

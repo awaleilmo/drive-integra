@@ -3,7 +3,7 @@ import { computed, ref, watchEffect, nextTick } from 'vue'
 import Modal from './Modal.vue'
 import { useStore } from 'vuex'
 import UploadService from '~/services/upload.service'
-import FolderService from "~/services/folder.service";
+import FolderService from '~/services/folder.service'
 
 const props = defineProps({
   show: {
@@ -21,7 +21,7 @@ const props = defineProps({
   isFile: {
     type: Boolean,
     default: false,
-  }
+  },
 })
 const store = useStore()
 
@@ -42,29 +42,33 @@ const closeModal = () => {
 }
 
 const save = async () => {
-    await store.dispatch('showLoading')
+  await store.dispatch('showLoading')
 
-    try {
-        const data = props.isFile ? await UploadService.renameFile(props.data.id, form.value) : await FolderService.renameFolder(props.data.id, form.value)
-        if (data.status) {
-            await store.dispatch('triggerToast', { message: data.message, type: 'success' })
-            closeModal()
-          await store.dispatch('setLoadFile', true)
-        } else {
-            await store.dispatch('triggerToast', { message: data.message, type: 'error' })
-        }
-        await store.dispatch('hideLoading')
-    } catch (error) {
-        await store.dispatch('hideLoading')
-        await store.dispatch('triggerToast', { message: error.message, type: 'error' })
+  try {
+    const data = props.isFile
+      ? await UploadService.renameFile(props.data.id, form.value)
+      : await FolderService.renameFolder(props.data.id, form.value)
+    if (data.status) {
+      await store.dispatch('triggerToast', { message: data.message, type: 'success' })
+      await store.dispatch('setLoadFile', true)
+      setTimeout( () => {
+        closeModal()
+      }, 200)
+    } else {
+      await store.dispatch('triggerToast', { message: data.message, type: 'error' })
     }
+    await store.dispatch('hideLoading')
+  } catch (error) {
+    await store.dispatch('hideLoading')
+    await store.dispatch('triggerToast', { message: error.message, type: 'error' })
+  }
 }
 
 watchEffect(() => {
   if (props.show) {
     nextTick(() => {
       inputField.value.focus()
-      inputField.value.setSelectionRange(0, inputField.value.value.length);
+      inputField.value.setSelectionRange(0, inputField.value.value.length)
     })
   }
 })

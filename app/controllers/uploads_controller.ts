@@ -24,13 +24,10 @@ export default class UploadsController {
       if (folderId) {
         const decryptId = decrypt(folderId)
         const splitDec = decryptId.split(':')
-        console.log(Number.parseInt(splitDec[1]), 'dari splitdec')
         folderId = Number.parseInt(splitDec[1])
         const checkFolder = await Folder.find(folderId)
         folderPath = checkFolder!.folderPath
       }
-
-      console.log(folderId)
 
       const fileName = ctx.request.input('fileName', '')
       const fileRaw = Date.now() + files!.clientName
@@ -185,6 +182,7 @@ export default class UploadsController {
         .where('folder_id', Folders!)
         .first()
       check!.version = check!.version + 1
+      check!.deletedAt = null
       await check!.save()
       return true
     } catch (error) {

@@ -110,12 +110,7 @@ const UploadFiles = async () => {
     let fileNameReplace = value[i].file['name']
     if (isDuplicate.value) {
       localDup = true
-      const getData = await uploadService.CountDuplicate({
-        data: [value[i].file['name']],
-        folderId: FolderIdGet(),
-      })
       if (!replace.value) {
-        fileData.value[i].same = Number.parseInt(getData.data[0]['sameFileCount'].toString()) + 1
         const fileNameWithExt = value[i].file['name']
         const baseName = fileNameWithExt.substring(0, fileNameWithExt.lastIndexOf('.'))
         fileNameReplace =

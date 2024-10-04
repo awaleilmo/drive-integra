@@ -23,6 +23,7 @@ const isFileData = ref([])
 const isFolderData = ref([])
 
 const folderAction = async (item) => {
+  console.log('masuk')
   let encrypts = encrypt(item.id.toString())
   window.location.href = '/home?folders=' + encrypts
 }
