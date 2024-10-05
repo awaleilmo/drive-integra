@@ -211,7 +211,13 @@ export default class FoldersController {
           data: [],
         })
       }
-      let fileData: any = Folder.query().where('user_id', userId)
+      let fileData: any = Folder.query()
+        .where('user_id', userId)
+        .preload('user')
+        .preload('parent')
+        .preload('openedByUser')
+        .preload('updatedByUser')
+        .preload('createdByUser')
       if (isTrashView) {
         fileData = await fileData.whereNotNull('deleted_at')
       } else {

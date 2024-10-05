@@ -70,4 +70,19 @@ export default class Upload extends BaseModel {
 
   @belongsTo(() => Folder)
   declare folder: BelongsTo<typeof Folder>
+
+  @belongsTo(() => User, {
+    foreignKey: 'openedBy',
+  })
+  declare openedByUser: BelongsTo<typeof User>
+
+  @belongsTo(() => User, {
+    foreignKey: 'updatedBy',
+  })
+  declare updatedByUser: BelongsTo<typeof User>
+
+  @belongsTo(() => User, {
+    foreignKey: 'createdBy',
+  })
+  declare createdByUser: BelongsTo<typeof User>
 }

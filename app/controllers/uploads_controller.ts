@@ -330,7 +330,13 @@ export default class UploadsController {
       if (!checkFolder) {
         folderId = null
       }
-      let fileData: any = Upload.query().where('user_id', userId)
+      let fileData: any = Upload.query()
+        .where('user_id', userId)
+        .preload('user')
+        .preload('folder')
+        .preload('openedByUser')
+        .preload('updatedByUser')
+        .preload('createdByUser')
       if (isTrashView) {
         fileData = await fileData.whereNotNull('deleted_at').where('folder_id', folderId)
       } else if (isAllUpdatedView) {

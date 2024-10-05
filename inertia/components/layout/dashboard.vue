@@ -7,6 +7,7 @@ import DarkModeButton from '~/components/DarkModeButton.vue'
 import { useStore } from 'vuex'
 import Toast from '~/components/Toast.vue'
 import MenuProgressUpload from '~/components/MenuProgressUpload.vue'
+import DetailSide from '~/components/layout/detailSide.vue'
 
 const sidebarFn = () => {
   side.value = !side.value
@@ -70,10 +71,13 @@ onMounted(() => {
           </button>
         </div>
       </nav>
-      <main class="p-4 relative">
-        <slot />
-        <menu-progress-upload />
-      </main>
+      <div class="flex">
+        <main class="p-4 w-full relative">
+          <slot />
+          <menu-progress-upload />
+        </main>
+        <detail-side :side="!side" @toggleSide="sidebarFn" />
+      </div>
       <toast />
     </div>
   </layout>

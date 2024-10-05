@@ -62,4 +62,19 @@ export default class Folder extends BaseModel {
     foreignKey: 'folderId',
   })
   declare uploads: HasMany<typeof Upload>
+
+  @belongsTo(() => User, {
+    foreignKey: 'openedBy',
+  })
+  declare openedByUser: BelongsTo<typeof User>
+
+  @belongsTo(() => User, {
+    foreignKey: 'updatedBy',
+  })
+  declare updatedByUser: BelongsTo<typeof User>
+
+  @belongsTo(() => User, {
+    foreignKey: 'createdBy',
+  })
+  declare createdByUser: BelongsTo<typeof User>
 }
