@@ -1,9 +1,9 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
-import { useStore } from "vuex";
-import uploadService from "~/services/upload.service";
-import RenameModal from "~/components/RenameModal.vue";
-import folderService from "~/services/folder.service";
+import { useStore } from 'vuex'
+import uploadService from '~/services/upload.service'
+import RenameModal from '~/components/RenameModal.vue'
+import folderService from '~/services/folder.service'
 
 const props = defineProps({
   align: {
@@ -86,6 +86,8 @@ const dropdownPositionClass = ref(props.align)
 const dropdownBTPositionClass = ref(top)
 const subDropdownPositionClass = ref(props.align)
 
+const sideDetail = computed(() => store.state.sideDetail)
+
 const toggle = () => {
   open.value = !open.value
   nextTick(() => {
@@ -93,6 +95,11 @@ const toggle = () => {
       adjustDropdownPosition()
     }
   })
+}
+
+const informationFn = () => {
+  store.dispatch('setSideDetail', !sideDetail.value)
+  store.dispatch('setSideDetailData', props.data)
 }
 
 const adjustDropdownPosition = () => {
@@ -117,16 +124,16 @@ const downloadFn = async (fileId) => {
       return
     }
 
-    let fileName = fileRecord.fileName;
-    const fileExt = fileRecord.fileExt;
+    let fileName = fileRecord.fileName
+    const fileExt = fileRecord.fileExt
 
     // Cek apakah fileName memiliki ekstensi
     if (!fileName.includes('.')) {
       // Jika tidak ada ekstensi di fileName, tambahkan dari fileExt
       if (fileExt) {
-        fileName = `${fileName}.${fileExt}`;
+        fileName = `${fileName}.${fileExt}`
       } else {
-        fileName = `${fileName}.txt`; // Default jika tidak ada file_ext
+        fileName = `${fileName}.txt` // Default jika tidak ada file_ext
       }
     }
 
@@ -162,7 +169,9 @@ const closeRenameModal = () => {
 const deleteFn = async () => {
   await store.dispatch('showLoading')
   try {
-    const data = props.isFile ? await uploadService.deleteFile(props.data.id) : await folderService.deleteFolder(props.data.id)
+    const data = props.isFile
+      ? await uploadService.deleteFile(props.data.id)
+      : await folderService.deleteFolder(props.data.id)
     if (data.status) {
       await store.dispatch('triggerToast', { message: data.message, type: 'success' })
       await store.dispatch('setLoadFile', true)
@@ -265,14 +274,14 @@ const deleteFn = async () => {
             </li>
           </ul>
         </li>
-        <li class="disabled">
+        <li @click="informationFn">
           <a>
             <iconify
               icon="solar:info-circle-bold"
               class="font-bold text-orange-400 dark:text-blue-600"
               height="1.8em"
             />
-            Informasi folder
+            Informasi {{ isFile ? 'File' : 'Folder' }}
           </a>
         </li>
         <hr class="my-2" />

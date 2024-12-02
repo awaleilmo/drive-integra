@@ -6,7 +6,6 @@ import app from '@adonisjs/core/services/app'
 import sharp from 'sharp'
 import { renameUpload } from '#validators/upload'
 import { DateTime } from 'luxon'
-import { rimrafSync } from 'rimraf'
 
 export default class UploadsController {
   async store(ctx: HttpContext) {

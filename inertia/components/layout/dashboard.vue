@@ -11,7 +11,12 @@ import DetailSide from '~/components/layout/detailSide.vue'
 
 const sidebarFn = () => {
   side.value = !side.value
-  localStorage.setItem('sidebar', side.value)
+  localStorage.setItem('sidebar', side.value.toString())
+}
+
+const sideDetailFn = () => {
+  store.dispatch('setSideDetail', !sideDetail.value)
+  store.dispatch('setSideDetailData', {})
 }
 
 const store = useStore()
@@ -21,6 +26,7 @@ const isLoading = computed(() => store.getters.isLoading)
 const isRender = ref(false)
 
 const side = ref(false)
+const sideDetail = computed(() => store.state.sideDetail)
 
 onBeforeMount(() => {
   side.value = localStorage.getItem('sidebar') === 'true'
@@ -46,7 +52,7 @@ onMounted(() => {
     "
     class="flex justify-center"
   >
-    <sideBar :side="side" @toggleSide="sidebarFn" />
+    <sideBar :side="side" @toggleSide="sidebarFn()" />
 
     <div class="w-screen">
       <nav class="navbar bg-base-100 shadow-md dark:shadow-success/10">
@@ -76,7 +82,7 @@ onMounted(() => {
           <slot />
           <menu-progress-upload />
         </main>
-        <detail-side :side="!side" @toggleSide="sidebarFn" />
+        <detail-side :side="sideDetail" @toggleSide="sideDetailFn()" />
       </div>
       <toast />
     </div>
