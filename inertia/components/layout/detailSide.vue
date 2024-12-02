@@ -56,11 +56,7 @@ const menu = ref([
 ])
 </script>
 <template>
-  <div
-    v-if="side"
-    class="absolute py-4 z-30 right-0 sm:relative sm:right-0 sm:z-0"
-    :class="['transition-all duration-300', props.side ? 'w-full sm:w-80' : 'w-0']"
-  >
+  <div v-if="side" class="absolute py-4 z-30 right-0 sm:relative sm:right-0 sm:z-0">
     <div class="absolute sm:hidden bg-base-300/70 w-screen h-screen"></div>
     <div
       class="absolute right-0 rounded-l-xl h-[calc(100vh-6rem)] shadow dark:shadow-success/20 flex flex-col overflow-auto sm:relative bg-base-100 border border-base-200 w-2/3 sm:w-full"
