@@ -11,6 +11,7 @@ export default createStore({
     loadFile: false,
     sideDetail: false,
     sideDetailData: {},
+    sideDetailIsFolder: false,
   },
   getters: {
     isLoading: (state: any) => state.isLoading,
@@ -22,6 +23,7 @@ export default createStore({
     loadFile: (state: any) => state.loadFile,
     sideDetail: (state: any) => state.sideDetail,
     sideDetailData: (state: any) => state.sideDetailData,
+    sideDetailIsFolder: (state: any) => state.sideDetailIsFolder,
   },
   mutations: {
     setLoading(state: any, status: any): void {
@@ -60,6 +62,9 @@ export default createStore({
     SET_SIDE_DETAIL_DATA(state: any, data: any): void {
       state.sideDetailData = data
     },
+    SET_SIDE_DETAIL_IS_FOLDER(state: any, status: boolean): void {
+      state.sideDetailIsFolder = status
+    },
   },
   actions: {
     showLoading({ commit }: any): void {
@@ -88,6 +93,9 @@ export default createStore({
     },
     setSideDetailData({ commit }: any, data: any): void {
       commit('SET_SIDE_DETAIL_DATA', data)
+    },
+    setSideDetailIsFolder({ commit }: any, status: boolean): void {
+      commit('SET_SIDE_DETAIL_IS_FOLDER', status)
     },
   },
 })

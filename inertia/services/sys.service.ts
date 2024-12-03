@@ -1,8 +1,17 @@
-import axios, { ResponseType }  from 'axios'
-
+import axios, { ResponseType } from 'axios'
 class SysService {
-  async serviceAuth(methods = 'GET', url = '', data = {}, multipart = false, customHeaders: { key: string; value: string }[] = [], responseType = 'json') {
-    customHeaders.push({key: 'Content-Type', value: multipart ? 'multipart/form-data' : 'application/json'})
+  async serviceAuth(
+    methods = 'GET',
+    url = '',
+    data = {},
+    multipart = false,
+    customHeaders: { key: string; value: string }[] = [],
+    responseType = 'json'
+  ) {
+    customHeaders.push({
+      key: 'Content-Type',
+      value: multipart ? 'multipart/form-data' : 'application/json',
+    })
     return axios({
       url: url,
       method: methods,

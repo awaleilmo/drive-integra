@@ -9,7 +9,7 @@ import InfoEmpty from '~/components/InfoEmpty.vue'
 import { encrypt } from '~/services/crypto.service.ts'
 import { useStore } from 'vuex'
 import uploadService from '~/services/upload.service'
-import folderService from "~/services/folder.service";
+import folderService from '~/services/folder.service'
 
 const props = defineProps({
   breadcrumbs: Object,
@@ -21,6 +21,7 @@ const isDragging = ref(false)
 const isLoadFile = computed(() => store.state.loadFile)
 const isFileData = ref([])
 const isFolderData = ref([])
+const selected = ref([])
 
 const folderAction = async (item) => {
   console.log('masuk')
@@ -69,6 +70,12 @@ const getFolder = async () => {
   } catch (error) {
     return []
   }
+}
+
+const selectedFn = (item) => {
+  store.dispatch('setSideDetailData', item)
+  selected.value = [item.id]
+  console.log(selected.value)
 }
 
 watch(isLoadFile, async (newVal) => {
@@ -125,6 +132,8 @@ onMounted(async () => {
               :key="index"
               :data="item"
               :preview="true"
+              :selected="selected.includes(item.id)"
+              @click="selectedFn(item)"
             />
           </div>
 

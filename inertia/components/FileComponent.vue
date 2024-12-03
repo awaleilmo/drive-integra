@@ -1,6 +1,10 @@
 <template>
   <div
-    class="shadow-md dark:shadow-base-content/30 select-none bg-base-200 basis-1/12 rounded-lg hover:btn-active"
+    class="shadow-md dark:shadow-base-content/30 select-none basis-1/12 rounded-lg"
+    :class="{
+      'bg-success/40 dark:bg-success/30': props.selected,
+      'bg-base-200': !props.selected,
+    }"
   >
     <div
       class="flex justify-start items-center text-sm gap-2 px-4 py-2 tooltip"
@@ -16,7 +20,7 @@
     <div
       v-if="props.preview"
       class="my-2 rounded-lg mx-2 flex justify-center items-center overflow-hidden aspect-square bg-white dark:bg-white/90 dark:text-base-300"
-      @click="modalOpenPreview = true"
+      @dblclick="modalOpenPreview = true"
     >
       <slot>
         <Iconify
@@ -64,6 +68,10 @@ const props = defineProps({
   data: {
     type: Object,
     default: {},
+  },
+  selected: {
+    type: Boolean,
+    default: false,
   },
 })
 const store = useStore()

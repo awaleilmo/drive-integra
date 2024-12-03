@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
 import { useStore } from 'vuex'
+import SideDetailStore from '~/store/side_detail.store.ts'
 import uploadService from '~/services/upload.service'
 import RenameModal from '~/components/RenameModal.vue'
 import folderService from '~/services/folder.service'
@@ -29,6 +30,7 @@ const props = defineProps({
 })
 
 const store = useStore()
+const sideDetailStore = new SideDetailStore(store)
 
 const closeOnEscape = (e) => {
   if (open.value && e.key === 'Escape') {
@@ -98,8 +100,8 @@ const toggle = () => {
 }
 
 const informationFn = () => {
-  store.dispatch('setSideDetail', !sideDetail.value)
-  store.dispatch('setSideDetailData', props.data)
+  sideDetailStore.actionSideDetail(true, props.data, !props.isFile)
+  toggle()
 }
 
 const adjustDropdownPosition = () => {
