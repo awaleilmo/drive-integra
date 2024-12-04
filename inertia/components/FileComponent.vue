@@ -20,7 +20,7 @@
     <div
       v-if="props.preview"
       class="my-2 rounded-lg mx-2 flex justify-center items-center overflow-hidden aspect-square bg-white dark:bg-white/90 dark:text-base-300"
-      @dblclick="modalOpenPreview = true"
+      @dblclick="openFile()"
     >
       <slot>
         <Iconify
@@ -56,6 +56,7 @@ import sysService from '~/services/sys.service.ts'
 import PreviewComponent from '~/components/Preview.vue'
 import { useStore } from 'vuex'
 import DetailDropTrash from '~/components/DetailDropTrash.vue'
+import uploadService from '~/services/upload.service.ts'
 const props = defineProps({
   preview: {
     type: Boolean,
@@ -88,6 +89,13 @@ const changeIcon = async () => {
   const color = await sysService.fileTypeColor()
   icons.value.icon = icon[props.data.fileExt.toLowerCase()] || icon['default']
   icons.value.class = color[props.data.fileExt.toLowerCase()] || color['default']
+}
+
+const openFile = async () => {
+  if (props.preview) {
+    await uploadService.opened(props.data.id.toString())
+    modalOpenPreview.value = true
+  }
 }
 
 const isImageOrVideo = () => {

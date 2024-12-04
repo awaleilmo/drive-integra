@@ -10,7 +10,8 @@ export default createStore({
     onUpload: false,
     loadFile: false,
     sideDetail: false,
-    sideDetailData: {},
+    sideDetailFileID: null,
+    sideDetailFolderID: null,
     sideDetailIsFolder: false,
   },
   getters: {
@@ -22,7 +23,8 @@ export default createStore({
     onUpload: (state: any) => state.onUpload,
     loadFile: (state: any) => state.loadFile,
     sideDetail: (state: any) => state.sideDetail,
-    sideDetailData: (state: any) => state.sideDetailData,
+    sideDetailFileID: (state: any) => state.sideDetailFileID,
+    sideDetailFolderID: (state: any) => state.sideDetailFolderID,
     sideDetailIsFolder: (state: any) => state.sideDetailIsFolder,
   },
   mutations: {
@@ -59,11 +61,18 @@ export default createStore({
     SET_SIDE_DETAIL(state: any, status: boolean): void {
       state.sideDetail = status
     },
-    SET_SIDE_DETAIL_DATA(state: any, data: any): void {
-      state.sideDetailData = data
+    SET_SIDE_DETAIL_FILE_ID(state: any, data: any): void {
+      state.sideDetailFileID = data
+    },
+    SET_SIDE_DETAIL_FOLDER_ID(state: any, data: any): void {
+      state.sideDetailFolderID = data
     },
     SET_SIDE_DETAIL_IS_FOLDER(state: any, status: boolean): void {
       state.sideDetailIsFolder = status
+    },
+    clearSideDetailID(state: any): void {
+      state.sideDetailFileID = null
+      state.sideDetailFolderID = null
     },
   },
   actions: {
@@ -91,8 +100,13 @@ export default createStore({
     setSideDetail({ commit }: any, status: boolean): void {
       commit('SET_SIDE_DETAIL', status)
     },
-    setSideDetailData({ commit }: any, data: any): void {
-      commit('SET_SIDE_DETAIL_DATA', data)
+    setSideDetailFileID({ commit }: any, data: any): void {
+      commit('clearSideDetailID')
+      commit('SET_SIDE_DETAIL_FILE_ID', data)
+    },
+    setSideDetailFolderID({ commit }: any, data: any): void {
+      commit('clearSideDetailID')
+      commit('SET_SIDE_DETAIL_FOLDER_ID', data)
     },
     setSideDetailIsFolder({ commit }: any, status: boolean): void {
       commit('SET_SIDE_DETAIL_IS_FOLDER', status)

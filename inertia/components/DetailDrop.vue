@@ -100,7 +100,7 @@ const toggle = () => {
 }
 
 const informationFn = () => {
-  sideDetailStore.actionSideDetail(true, props.data, !props.isFile)
+  sideDetailStore.actionSideDetail(true, props.data.id, !props.isFile)
   toggle()
 }
 

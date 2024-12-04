@@ -392,4 +392,76 @@ export default class UploadsController {
       })
     }
   }
+
+  async openedAt(ctx: HttpContext) {
+    try {
+      const user = ctx.auth.user!
+      const fileId = ctx.params.id
+      if (!fileId) {
+        return ctx.response.json({
+          statusCode: 404,
+          status: false,
+          message: 'File tidak ditemukan',
+        })
+      }
+
+      const check = await Upload.query().where('id', fileId).first()
+      if (!check) {
+        return ctx.response.json({
+          statusCode: 404,
+          status: false,
+          message: 'File tidak ditemukan',
+        })
+      }
+      check.openedBy = user.id
+      check.openedAt = DateTime.now()
+      await check.save()
+      return ctx.response.json({
+        statusCode: 200,
+        status: true,
+        message: 'File berhasil dibuka',
+      })
+    } catch (error) {
+      return ctx.response.json({
+        statusCode: 500,
+        status: false,
+        message: error.message,
+      })
+    }
+  }
+
+  async getById(ctx: HttpContext) {
+    try {
+      const fileId = ctx.params.id
+      const check = await Upload.query()
+        .where('id', fileId)
+        .preload('user')
+        .preload('folder')
+        .preload('openedByUser')
+        .preload('updatedByUser')
+        .preload('createdByUser')
+        .first()
+      if (!check) {
+        return ctx.response.json({
+          statusCode: 404,
+          status: false,
+          message: 'File tidak ditemukan',
+          data: [],
+        })
+      }
+      return ctx.response.json({
+        statusCode: 200,
+        status: true,
+        message: 'File ditemukan',
+        data: check,
+      })
+    } catch (error) {
+      return ctx.response.json({
+        statusCode: 500,
+        status: false,
+        message: error.message,
+        data: [],
+      })
+    }
+  }
 }

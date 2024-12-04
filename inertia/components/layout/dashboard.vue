@@ -16,7 +16,8 @@ const sidebarFn = () => {
 
 const sideDetailFn = () => {
   store.dispatch('setSideDetail', !sideDetail.value)
-  store.dispatch('setSideDetailData', {})
+  store.dispatch('setSideDetailFileID', {})
+  store.dispatch('setSideDetailFolderID', {})
 }
 
 const store = useStore()

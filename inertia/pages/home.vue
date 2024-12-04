@@ -10,6 +10,7 @@ import { encrypt } from '~/services/crypto.service.ts'
 import { useStore } from 'vuex'
 import uploadService from '~/services/upload.service'
 import folderService from '~/services/folder.service'
+import side_detailStore from '~/store/side_detail.store.ts'
 
 const props = defineProps({
   breadcrumbs: Object,
@@ -22,9 +23,10 @@ const isLoadFile = computed(() => store.state.loadFile)
 const isFileData = ref([])
 const isFolderData = ref([])
 const selected = ref([])
+const sideDetailStore = new side_detailStore(store)
 
 const folderAction = async (item) => {
-  console.log('masuk')
+  await folderService.opened(item.id.toString())
   let encrypts = encrypt(item.id.toString())
   window.location.href = '/home?folders=' + encrypts
 }
@@ -72,10 +74,43 @@ const getFolder = async () => {
   }
 }
 
-const selectedFn = (item) => {
-  store.dispatch('setSideDetailData', item)
-  selected.value = [item.id]
-  console.log(selected.value)
+const selectedFn = (item, isFolder, shiftKey) => {
+  sideDetailStore.actionUpdateDataAndFolder(item.id, isFolder)
+  if (shiftKey) {
+    if (
+      !selected.value.includes(
+        (itemData) => itemData.id === item.id && itemData['isFolder'] === isFolder
+      )
+    ) {
+      selected.value.push({
+        id: item.id,
+        isFolder: isFolder,
+      })
+    } else {
+      selected.value = selected.value.filter(
+        (itemData) => itemData.id !== item.id && itemData['isFolder'] === isFolder
+      )
+    }
+  } else {
+    if (
+      !selected.value.includes(
+        (itemData) => itemData.id === item.id && itemData['isFolder'] === isFolder
+      )
+    ) {
+      selected.value = [
+        {
+          id: item.id,
+          isFolder: isFolder,
+        },
+      ]
+    } else {
+      selected.value = []
+    }
+  }
+}
+
+const checkSelected = (item, isFolder) => {
+  return selected.value.find((data) => data.id === item.id && data['isFolder'] === isFolder)
 }
 
 watch(isLoadFile, async (newVal) => {
@@ -120,6 +155,8 @@ onMounted(async () => {
               :key="index"
               :data="item"
               @dblclick="folderAction(item)"
+              :selected="checkSelected(item, true)"
+              @click="selectedFn(item, true, $event.shiftKey)"
             />
           </div>
 
@@ -132,8 +169,8 @@ onMounted(async () => {
               :key="index"
               :data="item"
               :preview="true"
-              :selected="selected.includes(item.id)"
-              @click="selectedFn(item)"
+              :selected="checkSelected(item, false)"
+              @click="selectedFn(item, false, $event.shiftKey)"
             />
           </div>
 

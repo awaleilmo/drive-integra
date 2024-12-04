@@ -1,13 +1,17 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3'
-import { ref, computed, watchEffect, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Icon as Iconify } from '@iconify/vue'
 import { useStore } from 'vuex'
 import sysService from '~/services/sys.service.ts'
+import folderService from '~/services/folder.service.ts'
+import uploadService from '~/services/upload.service.ts'
+import { timeout } from '@adonisjs/vow/lib/props.js'
 
 const props = defineProps({
   side: {
     type: Boolean,
+    default: false,
   },
   toggleSide: {
     type: Function,
@@ -16,7 +20,12 @@ const props = defineProps({
 
 const store = useStore()
 const pages = usePage().props.auth
-const dataDetail = computed(() => store.state.sideDetailData)
+const dataDetail = ref({})
+const isRender = ref(true)
+const isImage = ref(false)
+const getID = ref(null)
+const fileIDState = computed(() => store.state.sideDetailFileID)
+const folderIDState = computed(() => store.state.sideDetailFolderID)
 const isFolder = computed(() => store.state.sideDetailIsFolder)
 const icons = ref({
   icon: 'solar:folder-bold-duotone',
@@ -26,8 +35,24 @@ const icons = ref({
 const emit = defineEmits(['toggleSide'])
 
 const sideBarFun = () => {
-  console.log('masuk')
   emit('toggleSide')
+}
+
+const loadData = async () => {
+  isRender.value = true
+  getID.value = isFolder.value ? folderIDState.value : fileIDState.value
+  if (isFolder.value) {
+    let result = await folderService.getById(getID.value.toString())
+    dataDetail.value = result.data
+  } else {
+    let result = await uploadService.getById(getID.value.toString())
+    dataDetail.value = result.data
+  }
+  setTimeout(async () => {
+    await changeIcon()
+    isImage.value = await isImageOrVideo(dataDetail.value)
+    isRender.value = false
+  }, 200) // SET
 }
 
 const isImageOrVideo = (data) => {
@@ -43,52 +68,95 @@ const changeIcon = async () => {
     const color = await sysService.fileTypeColor()
     icons.value.icon = icon[dataDetail.value['fileExt'].toLowerCase()] || icon['default']
     icons.value.class = color[dataDetail.value['fileExt'].toLowerCase()] || color['default']
+  } else {
+    icons.value.icon = 'solar:folder-bold-duotone'
+    icons.value.class = 'text-orange-400 dark:text-blue-600'
   }
 }
 
-watch(dataDetail, changeIcon, { deep: true })
+const formatFileSize = (bytes) => {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  if (bytes === 0) return '0 Byte'
+  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
+  return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`
+}
 
-const menu = ref([
-  {
-    title: 'Drive Saya',
-    icon: 'solar:folder-with-files-broken',
-    link: '/home',
-  },
-  {
-    title: 'Dibagikan kepada saya',
-    icon: 'solar:users-group-rounded-broken',
-    link: '/shared',
-  },
-  {
-    title: 'Terbaru',
-    icon: 'solar:clock-circle-broken',
-    link: '/latest',
-  },
-  {
-    title: 'Berbintang',
-    icon: 'solar:medal-ribbons-star-broken',
-    link: '/starry',
-  },
-  {
-    title: 'Sampah',
-    icon: 'solar:trash-bin-trash-broken',
-    link: '/trash',
-  },
-])
+const formatDate = (timestamp) => {
+  const options = { day: 'numeric', month: 'short', year: 'numeric' }
+  const date = new Date(timestamp)
+  return date.toLocaleDateString('id-ID', options)
+}
+
+const ownerOrNot = (item, name) => {
+  return pages.id === item ? 'Saya' : name
+}
+
+watch(fileIDState, loadData, { deep: true })
+watch(folderIDState, loadData, { deep: true })
 </script>
 <template>
   <div
     v-if="side"
     class="absolute py-4 z-30 right-0 sm:relative sm:right-0 sm:z-0 min-w-[30rem] h-full sm:min-w-[20rem]"
   >
-    <div class="absolute sm:hidden bg-base-300/70 w-screen h-screen"></div>
     <div
+      v-if="isRender"
       class="absolute right-0 rounded-l-xl sm:h-[calc(100vh-5.5rem)] shadow dark:shadow-success/20 flex flex-col overflow-auto sm:relative bg-base-100 border border-base-200 w-2/3 sm:w-full"
     >
       <div
         class="flex justify-between items-center text-sm gap-2 px-4 py-2 tooltip border-b border-base-300/50"
       >
-        <div class="cursor-pointer">
+        <div>
+          <div class="skeleton h-[2em] w-[2em] shrink-0 rounded-lg" />
+        </div>
+        <div class="skeleton h-[1.5em] w-full shrink rounded-md" />
+        <div class="skeleton h-[2em] w-[2em] shrink-0 rounded-full" />
+      </div>
+
+      <div class="w-full h-44 p-2 rounded-lg">
+        <div
+          class="skeleton w-full h-full rounded-lg overflow-hidden flex justify-center items-center"
+        />
+      </div>
+
+      <div class="p-2 overflow-auto">
+        <div class="font-bold mx-2 skeleton h-[1.5em] w-48 shrink-0 rounded" />
+        <div class="px-2">
+          <div class="flex flex-col gap-2 py-2">
+            <div class="flex items-center gap-2">
+              <div class="skeleton h-[2em] w-[2em] shrink-0 rounded-full" />
+              <div class="font-bold px-2 skeleton h-[1.5em] w-36 shrink-0 rounded" />
+            </div>
+            <div class="font-bold text-sm mt-3">
+              <div class="btn btn-sm skeleton w-28" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider" />
+
+      <div class="p-2 overflow-auto">
+        <div class="font-bold mx-2 skeleton h-[1.5em] w-28 shrink-0 rounded" />
+        <div class="px-2">
+          <div class="flex flex-col gap-4 py-2">
+            <div v-for="i in 6" :key="i" class="flex flex-col">
+              <div class="skeleton h-[1em] w-20 shrink-0 rounded" />
+              <div class="my-2 skeleton h-[1em] w-48 shrink-0 rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-else
+      class="absolute right-0 rounded-l-xl sm:h-[calc(100vh-5.5rem)] shadow dark:shadow-success/20 flex flex-col overflow-auto sm:relative bg-base-100 border border-base-200 w-2/3 sm:w-full"
+    >
+      <div
+        class="flex justify-between items-center text-sm gap-2 px-4 py-2 tooltip border-b border-base-300/50"
+      >
+        <div>
           <Iconify :icon="icons.icon" :class="icons.class" height="2em" />
         </div>
         <div class="text-sm text-left font-bold antialiased font-sans truncate group">
@@ -98,15 +166,15 @@ const menu = ref([
             >{{ isFolder ? dataDetail['folderName'] : dataDetail['fileName'] }}</span
           >
         </div>
-        <div class="cursor-pointer" @click="sideBarFun">
-          <Iconify icon="solar:close-circle-linear" height="2em" />
+        <div class="cursor-pointer group" @click="sideBarFun">
+          <Iconify icon="solar:close-circle-linear" height="2em" class="group-hover:text-error" />
         </div>
       </div>
 
       <div class="w-full h-44 p-2 rounded-lg">
         <slot name="imageContent">
           <div
-            v-if="isImageOrVideo(dataDetail)"
+            v-if="isImage"
             class="bg-base-300 w-full h-full rounded-lg overflow-hidden flex justify-center items-center"
           >
             <Iconify
@@ -139,11 +207,78 @@ const menu = ref([
               </div>
               <div class="font-bold text-sm">{{ dataDetail['createdByUser']['fullName'] }}</div>
             </div>
-            <div v-if="dataDetail['createdBy'] === pages.id" class="font-bold text-sm">
+            <div v-if="dataDetail['createdBy'] === pages.id" class="font-bold text-sm mt-3">
               <button class="btn btn-sm btn-outline btn-info">
-                <Iconify icon="solar:share-bold-duotone" height="1.5em" class="mr-2"></Iconify>
+                <Iconify icon="solar:settings-bold-duotone" height="1.5em"></Iconify>
                 Kelola Akses
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider" />
+
+      <div class="p-2 overflow-auto">
+        <label class="font-bold px-2">Detail {{ isFolder ? 'Folder' : 'File' }}</label>
+        <div class="px-2">
+          <div class="flex flex-col gap-4 py-2">
+            <div class="flex flex-col">
+              <div class="text-xs font-semibold">Jenis</div>
+              <div class="text-xs uppercase">
+                {{ !isFolder ? dataDetail['fileExt'] : 'folder' }}
+              </div>
+            </div>
+
+            <div v-if="!isFolder" class="flex flex-col">
+              <div class="text-xs font-semibold">Ukuran</div>
+              <div class="text-sm">{{ formatFileSize(dataDetail['fileSize'] ?? 0) }}</div>
+            </div>
+
+            <div class="flex flex-col">
+              <div class="text-xs font-semibold">Pemilik</div>
+              <div class="text-sm">
+                {{ ownerOrNot(dataDetail['createdBy'], dataDetail['createdByUser']['fullName']) }}
+              </div>
+            </div>
+
+            <div class="flex flex-col">
+              <div class="text-xs font-semibold">Dimodifikasi</div>
+              <div class="text-sm">
+                {{ formatDate(dataDetail['updatedAt']) }} oleh
+                {{
+                  ownerOrNot(
+                    dataDetail['updatedByUser']['id'],
+                    dataDetail['updatedByUser']['fullName']
+                  )
+                }}
+              </div>
+            </div>
+
+            <div class="flex flex-col">
+              <div class="text-xs font-semibold">Dibuka</div>
+              <div class="text-sm">
+                {{ dataDetail['openedAt'] === null ? '-' : formatDate(dataDetail['openedAt']) }}
+                oleh
+                {{
+                  dataDetail['openedAt'] === null
+                    ? '-'
+                    : ownerOrNot(dataDetail['openedBy'], dataDetail['openedByUser']['fullName'])
+                }}
+              </div>
+            </div>
+
+            <div class="flex flex-col">
+              <div class="text-xs font-semibold">Dibuat</div>
+              <div class="text-sm">
+                {{ formatDate(dataDetail['createdAt']) }} oleh
+                {{
+                  ownerOrNot(
+                    dataDetail['createdByUser']['id'],
+                    dataDetail['createdByUser']['fullName']
+                  )
+                }}
+              </div>
             </div>
           </div>
         </div>

@@ -111,6 +111,12 @@ class UploadService {
   async recoveryFile(id: string) {
     return await sysService.serviceAuth('POST', API_URL + '/recovery/' + id)
   }
+  async opened(id: string) {
+    return await sysService.serviceAuth('POST', API_URL + '/openedAt/' + id)
+  }
+  async getById(id: string) {
+    return await sysService.serviceAuth('GET', API_URL + '/getById/' + id)
+  }
 }
 
 export default new UploadService()

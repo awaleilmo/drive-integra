@@ -1,11 +1,29 @@
 class SideDetailService {
+  store: any
   constructor(store: any) {
     this.store = store
   }
-  actionSideDetail(toggle: boolean, data: any, isFolder: boolean = false) {
+  setToggle(toggle: boolean) {
     this.store.dispatch('setSideDetail', toggle)
-    this.store.dispatch('setSideDetailData', data)
+  }
+  setData(data: any, isFolder: boolean = false) {
+    if (isFolder) {
+      this.store.dispatch('setSideDetailFolderID', data)
+    } else {
+      this.store.dispatch('setSideDetailFileID', data)
+    }
+  }
+  setIsFolder(isFolder: boolean) {
     this.store.dispatch('setSideDetailIsFolder', isFolder)
+  }
+  actionSideDetail(toggle: boolean, data: any, isFolder: boolean = false) {
+    this.setToggle(toggle)
+    this.setData(data, isFolder)
+    this.setIsFolder(isFolder)
+  }
+  actionUpdateDataAndFolder(data: any, isFolder: boolean = false) {
+    this.setData(data, isFolder)
+    this.setIsFolder(isFolder)
   }
 }
 export default SideDetailService
