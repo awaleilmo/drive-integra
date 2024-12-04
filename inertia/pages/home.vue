@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import fileManagerSvg from '~/assets/file_manager.svg'
 import FileComponent from '~/components/FileComponent.vue'
 import FloatMenu from '~/components/FloatMenu.vue'
@@ -11,6 +11,7 @@ import { useStore } from 'vuex'
 import uploadService from '~/services/upload.service'
 import folderService from '~/services/folder.service'
 import side_detailStore from '~/store/side_detail.store.ts'
+import MenuAdd from '~/components/MenuAdd.vue'
 
 const props = defineProps({
   breadcrumbs: Object,
@@ -24,6 +25,41 @@ const isFileData = ref([])
 const isFolderData = ref([])
 const selected = ref([])
 const sideDetailStore = new side_detailStore(store)
+const contextMenuVisible = ref(false)
+const contextMenuStyle = ref({ top: '0px', left: '0px' })
+
+const showContextMenu = (event) => {
+  event.preventDefault()
+  event.preventDefault()
+
+  const mouseX = event.clientX
+  const mouseY = event.clientY
+  const parentElement = event.currentTarget
+  const parentRect = parentElement.getBoundingClientRect()
+
+  const menu = document.getElementById('context-menu')
+  const menuRect = menu.getBoundingClientRect()
+
+  let x = mouseX - parentRect.left
+  let y = mouseY - parentRect.top
+
+  // Menyesuaikan posisi menu agar tidak keluar dari elemen induk
+  // Posisi X: pastikan menu tidak melampaui batas kanan
+  if (x + menuRect.width > parentRect.width) {
+    x = parentRect.width - menuRect.width - 10
+  }
+
+  // Posisi Y: pastikan menu tidak melampaui batas bawah
+  if (y + menuRect.height > parentRect.height) {
+    y = parentRect.height - menuRect.height - 10
+  }
+
+  contextMenuStyle.value = {
+    top: `${y}px`,
+    left: `${x}px`,
+  }
+  contextMenuVisible.value = true
+}
 
 const folderAction = async (item) => {
   await folderService.opened(item.id.toString())
@@ -76,36 +112,29 @@ const getFolder = async () => {
 
 const selectedFn = (item, isFolder, shiftKey) => {
   sideDetailStore.actionUpdateDataAndFolder(item.id, isFolder)
+
   if (shiftKey) {
-    if (
-      !selected.value.includes(
-        (itemData) => itemData.id === item.id && itemData['isFolder'] === isFolder
-      )
-    ) {
-      selected.value.push({
-        id: item.id,
-        isFolder: isFolder,
-      })
+    // Jika shiftKey ditekan, kita periksa apakah item sudah ada di dalam array 'selected'
+    const itemIndex = selected.value.findIndex(
+      (data) => data.id === item.id && data['isFolder'] === isFolder
+    )
+    if (itemIndex === -1) {
+      // Jika item belum ada, tambahkan ke array selected
+      selected.value.push({ id: item.id, isFolder })
     } else {
-      selected.value = selected.value.filter(
-        (itemData) => itemData.id !== item.id && itemData['isFolder'] === isFolder
-      )
+      // Jika item sudah ada, hapus item tersebut dari array selected
+      selected.value.splice(itemIndex, 1)
     }
   } else {
-    if (
-      !selected.value.includes(
-        (itemData) => itemData.id === item.id && itemData['isFolder'] === isFolder
-      )
-    ) {
-      selected.value = [
-        {
-          id: item.id,
-          isFolder: isFolder,
-        },
-      ]
-    } else {
-      selected.value = []
+    // Cek apakah item sudah terpilih
+    const itemIndex = selected.value.findIndex(
+      (data) => data.id === item.id && data['isFolder'] === isFolder
+    )
+    if (itemIndex === -1) {
+      // Jika item belum terpilih, seleksi hanya item ini
+      selected.value = [{ id: item.id, isFolder }]
     }
+    // Jika item sudah terpilih, jangan ubah seleksi apapun
   }
 }
 
@@ -128,8 +157,34 @@ watch(isLoadFile, async (newVal) => {
   }
 })
 
+const hideContextMenu = () => {
+  contextMenuVisible.value = false
+}
+const clearSelected = () => {
+  const menuElement = document.getElementById('context-menu')
+  const menuSelected = document.getElementById('menu-selected')
+  const fileComponents = document.querySelectorAll('.file-component')
+
+  const clickedInsideMenu = menuElement && menuElement.contains(event.target)
+  const clickedInsideMenuSelected = menuSelected && menuSelected.contains(event.target)
+  const clickedInsideFileComponent = Array.from(fileComponents).some((el) =>
+    el.contains(event.target)
+  )
+
+  if (!clickedInsideMenu && !clickedInsideFileComponent && !clickedInsideMenuSelected) {
+    selected.value = []
+  }
+}
+
 onMounted(async () => {
   await store.dispatch('setLoadFile', true)
+  document.addEventListener('click', hideContextMenu)
+  document.addEventListener('mousedown', clearSelected)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', hideContextMenu)
+  document.removeEventListener('mousedown', clearSelected)
 })
 </script>
 
@@ -145,12 +200,44 @@ onMounted(async () => {
           @dragover.prevent="onDragOver"
           @dragleave="onDragLeave"
           @drop.prevent="onDrop"
+          @contextmenu="showContextMenu"
         >
+          <div
+            v-show="selected.length > 0"
+            id="menu-selected"
+            class="flex items-center gap-4 justify-start mb-2 p-0 rounded-full border border-base-300/50 bg-base-200"
+          >
+            <iconify
+              icon="solar:close-circle-bold-duotone"
+              class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-error"
+              height="1.8em"
+              @click="selected = []"
+            />
+            <span class="text-sm font-medium w-fit">{{ selected.length }} dipilih</span>
+            <div class="gap-3 flex">
+              <div class="tooltip tooltip-bottom" data-tip="Download">
+                <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
+                  <iconify icon="solar:download-square-bold-duotone" height="1.5em" />
+                </button>
+              </div>
+              <div class="tooltip tooltip-bottom" data-tip="Pindahkan">
+                <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
+                  <iconify icon="solar:move-to-folder-bold-duotone" height="1.5em" />
+                </button>
+              </div>
+              <div class="tooltip tooltip-bottom" data-tip="Pindahkan ke Sampah">
+                <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
+                  <iconify icon="solar:trash-bin-trash-bold-duotone" height="1.5em" />
+                </button>
+              </div>
+            </div>
+          </div>
           <label v-if="isFolderData.length > 0" class="text-base font-medium">Folder</label>
           <div
             class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 my-5"
           >
             <FileComponent
+              class="file-component"
               v-for="(item, index) in isFolderData"
               :key="index"
               :data="item"
@@ -165,6 +252,7 @@ onMounted(async () => {
             class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 mt-5"
           >
             <FileComponent
+              class="file-component"
               v-for="(item, index) in isFileData"
               :key="index"
               :data="item"
@@ -178,8 +266,12 @@ onMounted(async () => {
             :show="isFolderData.length === 0 && isFileData.length === 0"
             :src="fileManagerSvg"
             title="Tempat untuk semua file Anda"
-            message="Tarik file Anda ke sini atau gunakan tombol '+' untuk mengupload"
+            message="Tarik file Anda ke sini atau gunakan tombol '+' atau klik kanan untuk mengupload"
           />
+
+          <div id="context-menu" class="z-50 absolute" :style="contextMenuStyle">
+            <MenuAdd :active="contextMenuVisible" @close="contextMenuVisible = false" />
+          </div>
         </div>
       </template>
     </PanelDrive>

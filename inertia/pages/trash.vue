@@ -8,6 +8,7 @@ import FileComponent from '~/components/FileComponent.vue'
 import { useStore } from 'vuex'
 import uploadService from '~/services/upload.service'
 import folderService from '~/services/folder.service'
+import { Icon as Iconify } from '@iconify/vue'
 
 const store = useStore()
 const files = computed(() => store.state.fileMultiple)
@@ -70,19 +71,7 @@ onMounted(async () => {
       <template #main>
         <div class="w-full relative h-full overflow-y-auto overflow-x-hidden">
           <div role="alert" class="alert alert-info mb-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              class="h-6 w-6 shrink-0 stroke-current"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
+            <iconify icon="solar:danger-circle-bold-duotone" height="1.8em" />
             <span>Item dalam sampah akan dihapus selamanya setelah 30 hari</span>
           </div>
           <label v-if="isFolderData.length > 0" class="text-base font-medium">Folder</label>
