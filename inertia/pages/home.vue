@@ -27,9 +27,106 @@ const selected = ref([])
 const sideDetailStore = new side_detailStore(store)
 const contextMenuVisible = ref(false)
 const contextMenuStyle = ref({ top: '0px', left: '0px' })
+const selectionBox = ref({ x: 0, y: 0, width: 0, height: 0 })
+const isDraggingSelection = ref(false)
+const selectionStart = ref({ x: 0, y: 0 })
+const isClickEvent = ref(false)
+
+const startSelection = (event) => {
+  if (event.button !== 0) return
+  event.stopPropagation() // Mencegah konflik
+  isDraggingSelection.value = true
+  isClickEvent.value = true
+
+  const mouseX = event.clientX
+  const mouseY = event.clientY
+  const parentElement = event.currentTarget
+  const parentRect = parentElement.getBoundingClientRect()
+
+  selectionStart.value = { x: mouseX - parentRect.left, y: mouseY - parentRect.top }
+  selectionBox.value = {
+    x: mouseX - parentRect.left,
+    y: mouseY - parentRect.top,
+    width: 0,
+    height: 0,
+  }
+}
+
+const updateSelection = (event) => {
+  if (isDraggingSelection.value) {
+    const mouseX = event.clientX
+    const mouseY = event.clientY
+    const parentElement = event.currentTarget
+    const parentRect = parentElement.getBoundingClientRect()
+
+    let currentX = mouseX - parentRect.left
+    let currentY = mouseY - parentRect.top
+
+    if (currentX > parentRect.width) {
+      currentX = parentRect.width - 10
+    }
+
+    if (currentY > parentRect.height) {
+      currentY = parentRect.height - 10
+    }
+
+    const distanceX = Math.abs(currentX - selectionStart.value.x)
+    const distanceY = Math.abs(currentY - selectionStart.value.y)
+
+    // Tentukan ambang batas untuk mendeteksi drag
+    const dragThreshold = 5
+    if (distanceX > dragThreshold || distanceY > dragThreshold) {
+      isClickEvent.value = false // Hanya jika gerakan signifikan
+    }
+
+    selectionBox.value = {
+      x: Math.min(selectionStart.value.x, currentX),
+      y: Math.min(selectionStart.value.y, currentY),
+      width: Math.abs(selectionStart.value.x - currentX),
+      height: Math.abs(selectionStart.value.y - currentY),
+    }
+    if (!isClickEvent.value) {
+      applySelection()
+    }
+  }
+}
+
+const endSelection = () => {
+  if (isDraggingSelection.value) {
+    if (isClickEvent.value) {
+      clearSelected()
+    }
+    isDraggingSelection.value = false
+  }
+}
+
+const applySelection = () => {
+  if (selectionBox.value.width < 5 && selectionBox.value.height < 5) {
+    return
+  }
+
+  const selectedElements = document.querySelectorAll('.file-component')
+  selected.value = []
+
+  selectedElements.forEach((element) => {
+    const rect = element.getBoundingClientRect()
+    const parentRect = event.currentTarget['getBoundingClientRect']()
+
+    if (
+      rect.left - parentRect.left < selectionBox.value.x + selectionBox.value.width &&
+      rect.right - parentRect.left > selectionBox.value.x &&
+      rect.top - parentRect.top < selectionBox.value.y + selectionBox.value.height &&
+      rect.bottom - parentRect.top > selectionBox.value.y
+    ) {
+      const itemId = element.getAttribute('data-id')
+      const isFolder = element.getAttribute('data-is-folder') === 'true'
+      selected.value.push({ id: parseInt(itemId), isFolder })
+    }
+  })
+}
 
 const showContextMenu = (event) => {
-  event.preventDefault()
+  if (isDraggingSelection.value) return
   event.preventDefault()
 
   const mouseX = event.clientX
@@ -43,13 +140,10 @@ const showContextMenu = (event) => {
   let x = mouseX - parentRect.left
   let y = mouseY - parentRect.top
 
-  // Menyesuaikan posisi menu agar tidak keluar dari elemen induk
-  // Posisi X: pastikan menu tidak melampaui batas kanan
   if (x + menuRect.width > parentRect.width) {
     x = parentRect.width - menuRect.width - 10
   }
 
-  // Posisi Y: pastikan menu tidak melampaui batas bawah
   if (y + menuRect.height > parentRect.height) {
     y = parentRect.height - menuRect.height - 10
   }
@@ -85,6 +179,7 @@ const onDragLeave = () => {
 }
 
 const onDrop = (event) => {
+  if (isDraggingSelection.value) return
   if (!store.state.onUpload) {
     isDragging.value = false
     const droppedFiles = Array.from(event.dataTransfer.files)
@@ -114,27 +209,21 @@ const selectedFn = (item, isFolder, shiftKey) => {
   sideDetailStore.actionUpdateDataAndFolder(item.id, isFolder)
 
   if (shiftKey) {
-    // Jika shiftKey ditekan, kita periksa apakah item sudah ada di dalam array 'selected'
     const itemIndex = selected.value.findIndex(
       (data) => data.id === item.id && data['isFolder'] === isFolder
     )
     if (itemIndex === -1) {
-      // Jika item belum ada, tambahkan ke array selected
       selected.value.push({ id: item.id, isFolder })
     } else {
-      // Jika item sudah ada, hapus item tersebut dari array selected
       selected.value.splice(itemIndex, 1)
     }
   } else {
-    // Cek apakah item sudah terpilih
     const itemIndex = selected.value.findIndex(
       (data) => data.id === item.id && data['isFolder'] === isFolder
     )
     if (itemIndex === -1) {
-      // Jika item belum terpilih, seleksi hanya item ini
       selected.value = [{ id: item.id, isFolder }]
     }
-    // Jika item sudah terpilih, jangan ubah seleksi apapun
   }
 }
 
@@ -179,12 +268,10 @@ const clearSelected = () => {
 onMounted(async () => {
   await store.dispatch('setLoadFile', true)
   document.addEventListener('click', hideContextMenu)
-  document.addEventListener('mousedown', clearSelected)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', hideContextMenu)
-  document.removeEventListener('mousedown', clearSelected)
 })
 </script>
 
@@ -196,7 +283,11 @@ onBeforeUnmount(() => {
       </template>
       <template #main>
         <div
+          id="canvas-container"
           class="w-full relative h-full overflow-y-auto overflow-x-hidden"
+          @mousedown="startSelection"
+          @mousemove="updateSelection"
+          @mouseup="endSelection"
           @dragover.prevent="onDragOver"
           @dragleave="onDragLeave"
           @drop.prevent="onDrop"
@@ -232,6 +323,18 @@ onBeforeUnmount(() => {
               </div>
             </div>
           </div>
+
+          <div
+            v-if="isDraggingSelection"
+            class="absolute bg-blue-300 bg-opacity-50 border border-blue-500"
+            :style="{
+              left: `${selectionBox.x}px`,
+              top: `${selectionBox.y}px`,
+              width: `${selectionBox.width}px`,
+              height: `${selectionBox.height}px`,
+            }"
+          ></div>
+
           <label v-if="isFolderData.length > 0" class="text-base font-medium">Folder</label>
           <div
             class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 my-5"
@@ -241,6 +344,8 @@ onBeforeUnmount(() => {
               v-for="(item, index) in isFolderData"
               :key="index"
               :data="item"
+              :data-id="item.id"
+              :data-is-folder="true"
               @dblclick="folderAction(item)"
               :selected="checkSelected(item, true)"
               @click="selectedFn(item, true, $event.shiftKey)"
@@ -256,6 +361,8 @@ onBeforeUnmount(() => {
               v-for="(item, index) in isFileData"
               :key="index"
               :data="item"
+              :data-id="item.id"
+              :data-is-folder="false"
               :preview="true"
               :selected="checkSelected(item, false)"
               @click="selectedFn(item, false, $event.shiftKey)"
