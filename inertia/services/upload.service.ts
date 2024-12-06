@@ -117,6 +117,9 @@ class UploadService {
   async getById(id: string) {
     return await sysService.serviceAuth('GET', API_URL + '/getById/' + id)
   }
+  async moveFile(data: any) {
+    return await sysService.serviceAuth('POST', API_URL + '/move', data)
+  }
 }
 
 export default new UploadService()

@@ -24,6 +24,12 @@ export const recoveryFolder = vine.compile(
     id: vine.string().trim(),
   })
 )
+export const moveFolder = vine.compile(
+  vine.object({
+    id: vine.string().trim(),
+    targetId: vine.number().nullable(),
+  })
+)
 
 renameFolder.errorReporter = () => new JSONAPIErrorReporter()
 

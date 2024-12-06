@@ -1,5 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import { addFolder, renameFolder } from '#validators/folder'
+import { addFolder, renameFolder, moveFolder } from '#validators/folder'
 import { decrypt } from '#services/encryption_service'
 import Folder from '#models/folder'
 import fs from 'node:fs'
@@ -40,16 +40,19 @@ export default class FoldersController {
         rest.updatedBy = userId
         await rest.save()
         return ctx.response.json({
+          statusCode: 201,
           status: true,
           message: 'Folder ditambahkan',
         })
       }
       return ctx.response.json({
+        statusCode: 400,
         status: false,
         message: 'Folder sudah ada',
       })
     } catch (error) {
       ctx.response.json({
+        statusCode: 500,
         status: false,
         message: error.message,
       })
@@ -70,6 +73,7 @@ export default class FoldersController {
       const check = await Folder.query().where('id', folderId).where('user_id', user.id).first()
       if (!check) {
         return ctx.response.json({
+          statusCode: 404,
           status: false,
           message: 'Folder tidak ditemukan',
         })
@@ -78,11 +82,13 @@ export default class FoldersController {
       check.updatedBy = user.id
       await check.save()
       return ctx.response.json({
+        statusCode: 200,
         status: true,
         message: 'Folder berhasil diubah',
       })
     } catch (error) {
       ctx.response.json({
+        statusCode: 500,
         status: false,
         message: error.message,
       })
@@ -94,6 +100,7 @@ export default class FoldersController {
       const folderId = ctx.params.id
       if (!folderId) {
         return ctx.response.json({
+          statusCode: 404,
           status: false,
           message: 'Folder tidak ditemukan',
         })
@@ -101,6 +108,7 @@ export default class FoldersController {
       const check = await Folder.findOrFail(folderId)
       if (!check) {
         return ctx.response.json({
+          statusCode: 404,
           status: false,
           message: 'Folder tidak ditemukan',
         })
@@ -109,11 +117,13 @@ export default class FoldersController {
       await this.moveFolderToTrash(check)
 
       return ctx.response.json({
+        statusCode: 200,
         status: true,
         message: 'Folder berhasil dihapus',
       })
     } catch (error) {
       ctx.response.json({
+        statusCode: 500,
         status: false,
         message: error.message,
       })
@@ -144,6 +154,7 @@ export default class FoldersController {
       const folderId = ctx.params.id
       if (!folderId) {
         return ctx.response.json({
+          statusCode: 404,
           status: false,
           message: 'Folder tidak ditemukan',
         })
@@ -151,17 +162,20 @@ export default class FoldersController {
       const check = await Folder.findOrFail(folderId)
       if (!check) {
         return ctx.response.json({
+          statusCode: 404,
           status: false,
           message: 'Folder tidak ditemukan',
         })
       }
       await this.recoveryAllFolder(check)
       return ctx.response.json({
+        statusCode: 200,
         status: true,
         message: 'Folder berhasil dikembalikan',
       })
     } catch (error) {
       ctx.response.json({
+        statusCode: 500,
         status: false,
         message: error.message,
       })
@@ -309,6 +323,51 @@ export default class FoldersController {
         message: error.message,
         data: [],
       })
+    }
+  }
+
+  async moveFolder(ctx: HttpContext) {
+    try {
+      const user = ctx.auth.user!
+      const payload = await moveFolder.validate(ctx.request.all())
+      const check = await Folder.query().where('id', payload.id).where('user_id', user.id).first()
+      if (!check) {
+        return ctx.response.json({
+          statusCode: 404,
+          status: false,
+          message: 'Folder tidak ditemukan',
+        })
+      }
+
+      await this.moveFolderToAnotherFolder(check, payload.targetId)
+
+      return ctx.response.json({
+        statusCode: 200,
+        status: true,
+        message: 'Folder berhasil dipindahkan',
+      })
+    } catch (error) {
+      ctx.response.json({
+        statusCode: 500,
+        status: false,
+        message: error.message,
+      })
+    }
+  }
+
+  async moveFolderToAnotherFolder(folder: Folder, parentId: number | null) {
+    folder.parentId = parentId
+    await folder.save()
+
+    const files = await folder.related('uploads').query()
+    for (const file of files) {
+      file.folderId = parentId
+      await file.save()
+    }
+
+    const subfolders = await folder.related('folders').query()
+    for (const subfolder of subfolders) {
+      await this.moveFolderToAnotherFolder(subfolder, parentId) // Recursive call
     }
   }
 }

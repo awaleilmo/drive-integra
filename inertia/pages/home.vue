@@ -205,10 +205,10 @@ const getFolder = async () => {
   }
 }
 
-const selectedFn = (item, isFolder, shiftKey) => {
+const selectedFn = (item, isFolder, ctrlKey) => {
   sideDetailStore.actionUpdateDataAndFolder(item.id, isFolder)
 
-  if (shiftKey) {
+  if (ctrlKey) {
     const itemIndex = selected.value.findIndex(
       (data) => data.id === item.id && data['isFolder'] === isFolder
     )
@@ -357,7 +357,8 @@ onBeforeUnmount(() => {
               :data-is-folder="true"
               @dblclick="folderAction(item)"
               :selected="checkSelected(item, true)"
-              @click="selectedFn(item, true, $event.shiftKey)"
+              :totalSelected="selected.length"
+              @click="selectedFn(item, true, $event.ctrlKey || $event.metaKey)"
             />
           </div>
 
@@ -374,6 +375,7 @@ onBeforeUnmount(() => {
               :data-is-folder="false"
               :preview="true"
               :selected="checkSelected(item, false)"
+              :totalSelected="selected.length"
               @click="selectedFn(item, false, $event.shiftKey)"
             />
           </div>

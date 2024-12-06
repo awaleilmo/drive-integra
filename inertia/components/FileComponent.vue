@@ -15,7 +15,12 @@
         {{ props.data.folderName || props.data.fileName }}
       </div>
       <DetailDropTrash v-if="props.trash" :data="props.data" :isFile="props.preview" />
-      <DetailDrop v-else :data="props.data" :isFile="props.preview" />
+      <DetailDrop
+        v-else
+        :data="props.data"
+        :isFile="props.preview"
+        :disabled="selected && totalSelected > 1"
+      />
     </div>
     <div
       v-if="props.preview"
@@ -73,6 +78,10 @@ const props = defineProps({
   selected: {
     type: Boolean,
     default: false,
+  },
+  totalSelected: {
+    type: Number,
+    default: 0,
   },
 })
 const store = useStore()

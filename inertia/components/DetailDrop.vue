@@ -5,6 +5,7 @@ import SideDetailStore from '~/store/side_detail.store.ts'
 import uploadService from '~/services/upload.service'
 import RenameModal from '~/components/RenameModal.vue'
 import folderService from '~/services/folder.service'
+import FolderPopup from '~/components/FolderPopup.vue'
 
 const props = defineProps({
   align: {
@@ -24,6 +25,10 @@ const props = defineProps({
     default: {},
   },
   isFile: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
     type: Boolean,
     default: false,
   },
@@ -88,7 +93,10 @@ const dropdownPositionClass = ref(props.align)
 const dropdownBTPositionClass = ref(top)
 const subDropdownPositionClass = ref(props.align)
 
-const sideDetail = computed(() => store.state.sideDetail)
+const moveModal = ref({
+  open: false,
+  data: null,
+})
 
 const toggle = () => {
   open.value = !open.value
@@ -107,7 +115,7 @@ const informationFn = () => {
 const adjustDropdownPosition = () => {
   const screenWidth = window.innerWidth
   const screenHeight = window.innerHeight
-  const { right, left, top, bottom } = dropdownButton.value.getBoundingClientRect()
+  const { right, left, top, bottom } = dropdownButton.value['getBoundingClientRect']()
 
   dropdownPositionClass.value = right + 350 > screenWidth ? 'left' : 'right'
   subDropdownPositionClass.value = right + 350 > screenWidth ? 'left' : 'right'
@@ -129,22 +137,19 @@ const downloadFn = async (fileId) => {
     let fileName = fileRecord.fileName
     const fileExt = fileRecord.fileExt
 
-    // Cek apakah fileName memiliki ekstensi
     if (!fileName.includes('.')) {
-      // Jika tidak ada ekstensi di fileName, tambahkan dari fileExt
       if (fileExt) {
         fileName = `${fileName}.${fileExt}`
       } else {
-        fileName = `${fileName}.txt` // Default jika tidak ada file_ext
+        fileName = `${fileName}.txt`
       }
     }
 
-    // Membuat URL dari blob yang diunduh
     const url = window.URL.createObjectURL(new Blob([response]))
     const link = document.createElement('a')
     link.href = url
 
-    link.setAttribute('download', fileName) // Nama file untuk didownload
+    link.setAttribute('download', fileName)
     document.body.appendChild(link)
     link['click']()
     link.remove()
@@ -168,6 +173,16 @@ const closeRenameModal = () => {
   rename.value.open = false
 }
 
+const openMoveModal = () => {
+  moveModal.value.open = true
+  moveModal.value.data = props.data
+}
+
+const closeMoveModal = () => {
+  moveModal.value.open = false
+  moveModal.value.data = null
+}
+
 const deleteFn = async () => {
   await store.dispatch('showLoading')
   try {
@@ -189,12 +204,14 @@ const deleteFn = async () => {
 
 <template>
   <div class="relative inline-block text-left">
-    <div @click="toggle" ref="dropdownButton">
-      <Iconify
-        icon="solar:menu-dots-bold"
-        class="rotate-90 grow-0 hover:cursor-pointer btn btn-ghost btn-circle btn-xs"
-      />
-    </div>
+    <button
+      @click="toggle"
+      ref="dropdownButton"
+      :disabled="props.disabled"
+      class="rotate-90 grow-0 disabled btn btn-ghost btn-circle btn-sm"
+    >
+      <Iconify icon="solar:menu-dots-bold" class="text-lg font-bold" />
+    </button>
 
     <!-- Full Screen Dropdown Overlay -->
     <div v-show="open" class="fixed inset-0 z-40 aspect-square" @click="open = false"></div>
@@ -234,7 +251,7 @@ const deleteFn = async () => {
             />Bagikan
           </a>
         </li>
-        <li class="dropdown disabled" :class="[alignmentLRSubDropdown]">
+        <li class="dropdown" :class="[alignmentLRSubDropdown]">
           <a tabindex="0" role="button">
             <iconify
               icon="solar:folder-open-bold-duotone"
@@ -254,7 +271,7 @@ const deleteFn = async () => {
             class="dropdown-content z-10 menu p-2 shadow bg-base-100 rounded-box w-64"
             :class="[subDropdownPositionClass === 'left' ? 'mr-4' : '']"
           >
-            <li>
+            <li @click="openMoveModal">
               <a href="#">
                 <iconify
                   icon="solar:move-to-folder-bold-duotone"
@@ -301,4 +318,5 @@ const deleteFn = async () => {
     </div>
   </div>
   <rename-modal :data="props.data" :show="rename.open" @close="closeRenameModal" :isFile="isFile" />
+  <folder-popup :show="moveModal.open" :data="moveModal.data" @close="closeMoveModal" />
 </template>

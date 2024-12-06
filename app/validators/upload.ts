@@ -21,8 +21,17 @@ export const deleteUpload = vine.compile(
   })
 )
 
+export const moveFile = vine.compile(
+  vine.object({
+    id: vine.string().nullable(),
+    targetId: vine.number().nullable(),
+  })
+)
+
 renameUpload.errorReporter = () => new JSONAPIErrorReporter()
 
 deleteUpload.errorReporter = () => new JSONAPIErrorReporter()
 
 addUpload.errorReporter = () => new JSONAPIErrorReporter()
+
+moveFile.errorReporter = () => new JSONAPIErrorReporter()

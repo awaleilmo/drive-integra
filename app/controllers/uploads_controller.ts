@@ -4,7 +4,7 @@ import { decrypt } from '#services/encryption_service'
 import type { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 import sharp from 'sharp'
-import { renameUpload } from '#validators/upload'
+import { renameUpload, moveFile } from '#validators/upload'
 import { DateTime } from 'luxon'
 
 export default class UploadsController {
@@ -459,6 +459,43 @@ export default class UploadsController {
         status: false,
         message: error.message,
         data: [],
+      })
+    }
+  }
+
+  async moveFile(ctx: HttpContext) {
+    try {
+      const user = ctx.auth.user!
+      const payload = await moveFile.validate(ctx.request.all())
+      const fileId = payload.id
+      if (!fileId) {
+        return ctx.response.json({
+          statusCode: 404,
+          status: false,
+          message: 'File tidak ditemukan',
+        })
+      }
+      const check = await Upload.query().where('id', fileId).first()
+      if (!check) {
+        return ctx.response.json({
+          statusCode: 404,
+          status: false,
+          message: `File tidak ditemukan`,
+        })
+      }
+      check.folderId = payload.targetId || null
+      check.updatedBy = user.id
+      await check.save()
+      return ctx.response.json({
+        statusCode: 200,
+        status: true,
+        message: 'File berhasil dipindahkan',
+      })
+    } catch (error) {
+      return ctx.response.json({
+        statusCode: 500,
+        status: false,
+        message: error.message,
       })
     }
   }
