@@ -10,7 +10,7 @@ const props = defineProps({
 <template>
   <div
     v-if="show"
-    class="flex flex-col justify-center items-center gap-4 absolute top-0 bottom-0 right-0 left-0"
+    class="flex flex-col justify-center select-none items-center gap-4 absolute top-0 bottom-0 right-0 left-0"
   >
     <img :src="src" class="w-64" alt="File Manager" />
     <h1 class="text-3xl text-center">{{ title }}</h1>

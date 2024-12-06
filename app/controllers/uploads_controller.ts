@@ -17,7 +17,7 @@ export default class UploadsController {
       if (folderId === 'null' || folderId === '') {
         folderId = null
       }
-      let folderPath = `uploads/${user.id}`
+      let folderPath = `uploads/${user.randomString}`
       const replace = ctx.request.input('replace', 'false') === 'true'
       const isDuplicate = ctx.request.input('isDuplicate', 'false') === 'true'
 
@@ -25,14 +25,12 @@ export default class UploadsController {
         const decryptId = decrypt(folderId)
         const splitDec = decryptId.split(':')
         folderId = Number.parseInt(splitDec[1])
-        const checkFolder = await Folder.find(folderId)
-        folderPath = checkFolder!.folderPath
       }
 
       const fileName = ctx.request.input('fileName', '')
       const fileRaw = Date.now() + files!.clientName
       const filePath = `${folderPath}/${fileRaw}`
-      const thumbnailPath = `thumbnail/${user.id + 'sdf' + fileRaw}`
+      const thumbnailPath = `thumbnail/${user.randomString + 'THUMBNAIL' + fileRaw}`
 
       try {
         await files!.move(app.publicPath(folderPath), {

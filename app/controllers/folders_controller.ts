@@ -10,14 +10,15 @@ import { DateTime } from 'luxon'
 export default class FoldersController {
   async addFolder(ctx: HttpContext) {
     try {
-      const userId = ctx.auth.user?.id || 0
+      const user = ctx.auth.user!
+      const userId = user?.id || 0
       let parentId = ctx.request.input('parentId', null)
       const checkParent = await Folder.find(parentId)
       if (!checkParent) {
         parentId = null
       }
       const payload = await addFolder.validate(ctx.request.all())
-      let folderPath = `uploads/${userId}`
+      let folderPath = `uploads/${user.randomString}`
       const check = Folder.query()
       check.where('folder_name', payload.folderName)
       if (parentId !== null) {

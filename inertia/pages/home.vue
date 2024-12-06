@@ -279,7 +279,7 @@ onBeforeUnmount(() => {
   <Layout>
     <PanelDrive :breadcrumbs="props.breadcrumbs" defaultHomeUrl="/home">
       <template #header>
-        <h1>Drive Saya</h1>
+        <h1 class="select-none">Drive Saya</h1>
       </template>
       <template #main>
         <div
@@ -294,33 +294,40 @@ onBeforeUnmount(() => {
           @contextmenu="showContextMenu"
         >
           <div
-            v-show="selected.length > 0"
+            v-show="isFolderData.length > 0 || isFileData.length > 0"
             id="menu-selected"
-            class="flex items-center gap-4 justify-start mb-2 p-0 rounded-full border border-base-300/50 bg-base-200"
+            class="flex items-center gap-4 justify-start mb-2 p-0 h-9 rounded-full border border-base-300/50 bg-base-200"
           >
-            <iconify
-              icon="solar:close-circle-bold-duotone"
-              class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-error"
-              height="1.8em"
-              @click="selected = []"
-            />
-            <span class="text-sm font-medium w-fit">{{ selected.length }} dipilih</span>
-            <div class="gap-3 flex">
-              <div class="tooltip tooltip-bottom" data-tip="Download">
-                <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
-                  <iconify icon="solar:download-square-bold-duotone" height="1.5em" />
-                </button>
+            <div v-if="selected.length > 0" class="flex justify-start items-center gap-4">
+              <iconify
+                icon="solar:close-circle-bold-duotone"
+                class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-error"
+                height="1.8em"
+                @click="selected = []"
+              />
+              <span class="text-sm font-medium w-fit select-none"
+                >{{ selected.length }} dipilih</span
+              >
+              <div class="gap-3 flex">
+                <div class="tooltip tooltip-bottom" data-tip="Download">
+                  <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
+                    <iconify icon="solar:download-square-bold-duotone" height="1.5em" />
+                  </button>
+                </div>
+                <div class="tooltip tooltip-bottom" data-tip="Pindahkan">
+                  <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
+                    <iconify icon="solar:move-to-folder-bold-duotone" height="1.5em" />
+                  </button>
+                </div>
+                <div class="tooltip tooltip-bottom" data-tip="Pindahkan ke Sampah">
+                  <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
+                    <iconify icon="solar:trash-bin-trash-bold-duotone" height="1.5em" />
+                  </button>
+                </div>
               </div>
-              <div class="tooltip tooltip-bottom" data-tip="Pindahkan">
-                <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
-                  <iconify icon="solar:move-to-folder-bold-duotone" height="1.5em" />
-                </button>
-              </div>
-              <div class="tooltip tooltip-bottom" data-tip="Pindahkan ke Sampah">
-                <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
-                  <iconify icon="solar:trash-bin-trash-bold-duotone" height="1.5em" />
-                </button>
-              </div>
+            </div>
+            <div v-else class="px-3 py-2 text-xs leading-4 text-gray-400">
+              Tarik file Anda ke sini atau gunakan tombol '+' atau klik kanan untuk upload
             </div>
           </div>
 
@@ -335,7 +342,9 @@ onBeforeUnmount(() => {
             }"
           ></div>
 
-          <label v-if="isFolderData.length > 0" class="text-base font-medium">Folder</label>
+          <label v-if="isFolderData.length > 0" class="text-base font-medium select-none"
+            >Folder</label
+          >
           <div
             class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 my-5"
           >
@@ -352,7 +361,7 @@ onBeforeUnmount(() => {
             />
           </div>
 
-          <label v-if="isFileData.length > 0" class="text-base font-medium">File</label>
+          <label v-if="isFileData.length > 0" class="text-base font-medium select-none">File</label>
           <div
             class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 mt-5"
           >
@@ -373,7 +382,7 @@ onBeforeUnmount(() => {
             :show="isFolderData.length === 0 && isFileData.length === 0"
             :src="fileManagerSvg"
             title="Tempat untuk semua file Anda"
-            message="Tarik file Anda ke sini atau gunakan tombol '+' atau klik kanan untuk mengupload"
+            message="Tarik file Anda ke sini atau gunakan tombol '+' atau klik kanan untuk upload"
           />
 
           <div id="context-menu" class="z-50 absolute" :style="contextMenuStyle">
