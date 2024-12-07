@@ -13,8 +13,21 @@ class SideDetailService {
       this.store.dispatch('setSideDetailFileID', data)
     }
   }
+  clearDataID() {
+    this.store.dispatch('setSideDetailFolderID', null)
+    this.store.dispatch('setSideDetailFileID', null)
+    this.setIsFolder(true)
+    this.setSelectedLength(0)
+  }
   setIsFolder(isFolder: boolean) {
     this.store.dispatch('setSideDetailIsFolder', isFolder)
+  }
+  setSelectedLength(length: number) {
+    this.store.dispatch('setSideDetailSelectedLength', length)
+  }
+  setNameFolderDefault(data: any) {
+    let name = data.length > 0 ? data[data.length - 1].name : 'Drive Saya'
+    this.store.dispatch('setSideDetailSubFolder', name)
   }
   actionSideDetail(toggle: boolean, data: any, isFolder: boolean = false) {
     this.setToggle(toggle)

@@ -13,6 +13,8 @@ export default createStore({
     sideDetailFileID: null,
     sideDetailFolderID: null,
     sideDetailIsFolder: false,
+    sideDetailSelectedLength: 0,
+    sideDetailSubFolder: 'Drive Saya',
   },
   getters: {
     isLoading: (state: any) => state.isLoading,
@@ -26,6 +28,8 @@ export default createStore({
     sideDetailFileID: (state: any) => state.sideDetailFileID,
     sideDetailFolderID: (state: any) => state.sideDetailFolderID,
     sideDetailIsFolder: (state: any) => state.sideDetailIsFolder,
+    sideDetailSelectedLength: (state: any) => state.sideDetailSelectedLength,
+    sideDetailSubFolder: (state: any) => state.sideDetailSubFolder,
   },
   mutations: {
     setLoading(state: any, status: any): void {
@@ -74,6 +78,12 @@ export default createStore({
       state.sideDetailFileID = null
       state.sideDetailFolderID = null
     },
+    SET_SIDE_DETAIL_SELECTED_LENGTH(state: any, length: number): void {
+      state.sideDetailSelectedLength = length
+    },
+    SET_SIDE_DETAIL_SUB_FOLDER(state: any, subFolder: string): void {
+      state.sideDetailSubFolder = subFolder
+    },
   },
   actions: {
     showLoading({ commit }: any): void {
@@ -110,6 +120,12 @@ export default createStore({
     },
     setSideDetailIsFolder({ commit }: any, status: boolean): void {
       commit('SET_SIDE_DETAIL_IS_FOLDER', status)
+    },
+    setSideDetailSelectedLength({ commit }: any, length: number): void {
+      commit('SET_SIDE_DETAIL_SELECTED_LENGTH', length)
+    },
+    setSideDetailSubFolder({ commit }: any, subFolder: string): void {
+      commit('SET_SIDE_DETAIL_SUB_FOLDER', subFolder)
     },
   },
 })

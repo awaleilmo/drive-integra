@@ -121,8 +121,14 @@ const applySelection = () => {
       const itemId = element.getAttribute('data-id')
       const isFolder = element.getAttribute('data-is-folder') === 'true'
       selected.value.push({ id: parseInt(itemId), isFolder })
+      sideDetailStore.actionUpdateDataAndFolder(itemId, isFolder)
     }
   })
+  if (selected.value.length <= 0) {
+    sideDetailStore.clearDataID()
+  }
+
+  sideDetailStore.setSelectedLength(selected.value.length)
 }
 
 const showContextMenu = (event) => {
@@ -225,6 +231,8 @@ const selectedFn = (item, isFolder, ctrlKey) => {
       selected.value = [{ id: item.id, isFolder }]
     }
   }
+
+  sideDetailStore.setSelectedLength(selected.value.length)
 }
 
 const checkSelected = (item, isFolder) => {
@@ -262,12 +270,14 @@ const clearSelected = () => {
 
   if (!clickedInsideMenu && !clickedInsideFileComponent && !clickedInsideMenuSelected) {
     selected.value = []
+    sideDetailStore.clearDataID()
   }
 }
 
 onMounted(async () => {
   await store.dispatch('setLoadFile', true)
   document.addEventListener('click', hideContextMenu)
+  sideDetailStore.setNameFolderDefault(props.breadcrumbs)
 })
 
 onBeforeUnmount(() => {
