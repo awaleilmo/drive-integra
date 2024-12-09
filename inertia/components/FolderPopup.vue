@@ -89,21 +89,17 @@ watch(show, () => {
 
 <template>
   <modal :show="props.show" @close="closeModal" maxWidth="lg">
-    <div class="py-6 px-6 form-control">
-      <label class="text-2xl font-medium"
+    <div class="py-6 px-6 flex flex-col items-start justify-start">
+      <label class="text-xl text-start font-medium"
         >Pindahkan
         {{
           dataProp['data'].length > 1 ? dataProp['data'].length + 'item' : `"${titleName}"`
         }}</label
       >
-      <input
-        @keyup.enter="folderSave"
-        ref="inputFolderName"
-        type="text"
-        placeholder="Nama Folder"
-        v-model="folderModal.name"
-        class="input input-bordered w-full mt-5"
-      />
+      <div class="py-6">
+        Lokasi Saat ini:
+        <div class="btn btn-sm btn-outline">folder</div>
+      </div>
       <div class="mt-3 flex justify-end gap-4">
         <div @click="closeFolderModal" class="btn btn-sm btn-ghost text-red-400">Batal</div>
         <div @click="folderSave" class="btn btn-sm btn-ghost text-blue-400">Buat</div>
