@@ -175,7 +175,10 @@ const closeRenameModal = () => {
 
 const openMoveModal = () => {
   moveModal.value.open = true
-  moveModal.value.data = props.data
+  moveModal.value.data = {
+    data: [props.data.id],
+    folderId: props.data.parentId || props.data.folderId,
+  }
 }
 
 const closeMoveModal = () => {
@@ -318,5 +321,10 @@ const deleteFn = async () => {
     </div>
   </div>
   <rename-modal :data="props.data" :show="rename.open" @close="closeRenameModal" :isFile="isFile" />
-  <folder-popup :show="moveModal.open" :data="moveModal.data" @close="closeMoveModal" />
+  <folder-popup
+    :show="moveModal.open"
+    :data-prop="moveModal.data"
+    @close="closeMoveModal"
+    :title-name="isFile ? data.fileName : data['folderName']"
+  />
 </template>

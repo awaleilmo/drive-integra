@@ -7,9 +7,16 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  data: {
+  dataProp: {
     type: Object,
-    default: {},
+    default: {
+      data: [],
+      folderId: null,
+    },
+  },
+  titleName: {
+    type: String,
+    default: 'Folder',
   },
   closeable: {
     type: Boolean,
@@ -30,7 +37,7 @@ const show = computed(() => props.show)
 const isLoading = ref(false)
 const getFolderId = ref(null)
 const model = ref({
-  id: null,
+  id: [],
   targetId: null,
   currentFolderId: null,
 })
@@ -62,7 +69,6 @@ const getFolder = async () => {
 
 watch(isLoading, async (newVal) => {
   if (newVal) {
-    console.log(model.value, 'ini model')
     await getFolder().then((data) => {
       isFolderData.value = data
     })
@@ -74,8 +80,8 @@ watch(isLoading, async (newVal) => {
 
 watch(show, () => {
   if (show.value) {
-    model.value.id = props.data.id
-    model.value.currentFolderId = props.data.parentId || props.data.folderId
+    model.value.id = props.dataProp['data']
+    model.value.currentFolderId = props.dataProp['folderId']
     isLoading.value = true
   }
 })
@@ -84,7 +90,12 @@ watch(show, () => {
 <template>
   <modal :show="props.show" @close="closeModal" maxWidth="lg">
     <div class="py-6 px-6 form-control">
-      <label class="text-2xl font-medium">Folder Baru</label>
+      <label class="text-2xl font-medium"
+        >Pindahkan
+        {{
+          dataProp['data'].length > 1 ? dataProp['data'].length + 'item' : `"${titleName}"`
+        }}</label
+      >
       <input
         @keyup.enter="folderSave"
         ref="inputFolderName"
