@@ -36,6 +36,7 @@ const props = defineProps({
 
 const store = useStore()
 const sideDetailStore = new SideDetailStore(store)
+const isLoadFile = computed(() => store.state.loadFile)
 
 const closeOnEscape = (e) => {
   if (open.value && e.key === 'Escape') {
@@ -177,7 +178,7 @@ const openMoveModal = () => {
   moveModal.value.open = true
   moveModal.value.data = {
     data: [{ id: props.data.id, isFile: props.isFile }],
-    folderId: props.data.parentId || props.data.folderId,
+    folderId: props.isFile ? props.data.folderId : props.data.parentId,
   }
 }
 
@@ -203,6 +204,10 @@ const deleteFn = async () => {
   }
   await store.dispatch('hideLoading')
 }
+
+watch(isLoadFile, () => {
+  open.value = false
+})
 </script>
 
 <template>

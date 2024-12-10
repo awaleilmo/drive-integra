@@ -251,6 +251,7 @@ watch(isLoadFile, async (newVal) => {
     await getFolder().then((data) => {
       isFolderData.value = data
     })
+    selected.value = []
     setTimeout(async () => {
       await store.dispatch('setLoadFile', false)
     }, 1000)
