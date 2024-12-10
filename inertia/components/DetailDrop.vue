@@ -176,7 +176,7 @@ const closeRenameModal = () => {
 const openMoveModal = () => {
   moveModal.value.open = true
   moveModal.value.data = {
-    data: [props.data.id],
+    data: [{ id: props.data.id, isFile: props.isFile }],
     folderId: props.data.parentId || props.data.folderId,
   }
 }
@@ -284,7 +284,7 @@ const deleteFn = async () => {
                 Pindahkan
               </a>
             </li>
-            <li>
+            <li disabled="disabled">
               <a href="#">
                 <iconify
                   icon="solar:star-outline"

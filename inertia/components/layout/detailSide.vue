@@ -8,6 +8,7 @@ import folderService from '~/services/folder.service.ts'
 import uploadService from '~/services/upload.service.ts'
 import svgSearchDetail from '~/assets/search_detail.svg'
 import svgSelected from '~/assets/selected.svg'
+import { encrypt } from '~/services/crypto.service.ts'
 
 const props = defineProps({
   side: {
@@ -20,6 +21,7 @@ const props = defineProps({
 })
 
 const store = useStore()
+const side = computed(() => props.side)
 const pages = usePage().props.auth
 const dataDetail = ref({})
 const isRender = ref(true)
@@ -45,14 +47,16 @@ const sideBarFun = () => {
 const loadData = async () => {
   isRender.value = true
   checkID.value = false
+  console.log('folderIDState.value', folderIDState.value)
   if (fileIDState.value !== null || folderIDState.value !== null) {
     checkID.value = true
     getID.value = isFolder.value ? folderIDState.value : fileIDState.value
+    let encrypts = encrypt(getID.value.toString())
     if (isFolder.value) {
-      let result = await folderService.getById(getID.value.toString())
+      let result = await folderService.getById(encrypts)
       dataDetail.value = result.data
     } else {
-      let result = await uploadService.getById(getID.value.toString())
+      let result = await uploadService.getById(encrypts)
       dataDetail.value = result.data
     }
     setTimeout(async () => {
@@ -102,7 +106,6 @@ const ownerOrNot = (item, name) => {
   return pages.id === item ? 'Saya' : name
 }
 
-watch(fileIDState, loadData, { deep: true })
 watch(folderIDState, loadData, { deep: true })
 </script>
 <template>

@@ -111,11 +111,11 @@ export default createStore({
       commit('SET_SIDE_DETAIL', status)
     },
     setSideDetailFileID({ commit }: any, data: any): void {
-      commit('clearSideDetailID')
+      // commit('clearSideDetailID')
       commit('SET_SIDE_DETAIL_FILE_ID', data)
     },
     setSideDetailFolderID({ commit }: any, data: any): void {
-      commit('clearSideDetailID')
+      // commit('clearSideDetailID')
       commit('SET_SIDE_DETAIL_FOLDER_ID', data)
     },
     setSideDetailIsFolder({ commit }: any, status: boolean): void {

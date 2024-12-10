@@ -25,6 +25,7 @@ const isFileData = ref([])
 const isFolderData = ref([])
 const selected = ref([])
 const sideDetailStore = new side_detailStore(store)
+const sideDetail = computed(() => store.state.sideDetail)
 const contextMenuVisible = ref(false)
 const contextMenuStyle = ref({ top: '0px', left: '0px' })
 const selectionBox = ref({ x: 0, y: 0, width: 0, height: 0 })
@@ -212,7 +213,9 @@ const getFolder = async () => {
 }
 
 const selectedFn = (item, isFolder, ctrlKey) => {
-  sideDetailStore.actionUpdateDataAndFolder(item.id, isFolder)
+  if (sideDetail.value) {
+    sideDetailStore.actionUpdateDataAndFolder(item.id, isFolder)
+  }
 
   if (ctrlKey) {
     const itemIndex = selected.value.findIndex(

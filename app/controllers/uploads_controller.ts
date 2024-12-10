@@ -430,7 +430,11 @@ export default class UploadsController {
 
   async getById(ctx: HttpContext) {
     try {
-      const fileId = ctx.params.id
+      let fileId = ctx.params.id
+      let decryptId = ''
+      decryptId = decrypt(fileId)
+      const splitDec = decryptId.split(':')
+      fileId = Number.parseInt(splitDec[1])
       const check = await Upload.query()
         .where('id', fileId)
         .preload('user')

@@ -213,7 +213,7 @@ export default class FoldersController {
       if (folderId !== null) {
         decryptId = decrypt(folderId)
         const splitDec = decryptId.split(':')
-        folderId = Number.parseInt(splitDec[1])
+        folderId = Number.parseInt(splitDec[1]) || null
       }
       const check = await Folder.query()
         .where('parent_id', folderId)
@@ -293,7 +293,12 @@ export default class FoldersController {
 
   async getById(ctx: HttpContext) {
     try {
-      const folderId = ctx.params.id
+      let folderId = ctx.params.id
+      let decryptId = ''
+      decryptId = decrypt(folderId)
+      const splitDec = decryptId.split(':')
+      folderId = Number.parseInt(splitDec[1])
+
       const check = await Folder.query()
         .preload('user')
         .preload('parent')

@@ -7,11 +7,9 @@ class SideDetailService {
     this.store.dispatch('setSideDetail', toggle)
   }
   setData(data: any, isFolder: boolean = false) {
-    if (isFolder) {
-      this.store.dispatch('setSideDetailFolderID', data)
-    } else {
-      this.store.dispatch('setSideDetailFileID', data)
-    }
+    console.log('isFolder', isFolder, 'data', data)
+    this.store.dispatch('setSideDetailFolderID', isFolder ? data : null)
+    this.store.dispatch('setSideDetailFileID', isFolder ? null : data)
   }
   clearDataID() {
     this.store.dispatch('setSideDetailFolderID', null)
