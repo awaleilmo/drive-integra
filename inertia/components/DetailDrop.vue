@@ -5,6 +5,7 @@ import SideDetailStore from '~/store/side_detail.store.ts'
 import uploadService from '~/services/upload.service'
 import RenameModal from '~/components/RenameModal.vue'
 import folderService from '~/services/folder.service'
+import starService from '~/services/star.service.ts'
 import folderPopupStore from '~/store/folder_popup.store.ts'
 
 const props = defineProps({
@@ -38,6 +39,7 @@ const store = useStore()
 const sideDetailStore = new SideDetailStore(store)
 const folderStore = new folderPopupStore(store)
 const isLoadFile = computed(() => store.state.loadFile)
+const isStarred = ref(props.data.isStarred || false)
 
 const closeOnEscape = (e) => {
   if (open.value && e.key === 'Escape') {
@@ -94,11 +96,6 @@ const dropdownMenu = ref(null)
 const dropdownPositionClass = ref(props.align)
 const dropdownBTPositionClass = ref(top)
 const subDropdownPositionClass = ref(props.align)
-
-const moveModal = ref({
-  open: false,
-  data: null,
-})
 
 const toggle = () => {
   open.value = !open.value
@@ -184,11 +181,6 @@ const openMoveModal = () => {
   )
 }
 
-const closeMoveModal = () => {
-  moveModal.value.open = false
-  moveModal.value.data = null
-}
-
 const deleteFn = async () => {
   await store.dispatch('showLoading')
   try {
@@ -205,6 +197,19 @@ const deleteFn = async () => {
     await store.dispatch('triggerToast', { message: error.message, type: 'error' })
   }
   await store.dispatch('hideLoading')
+}
+
+const toggleStart = async () => {
+  isStarred.value = !isStarred.value
+  const res = props.isFile
+    ? await starService.toggleFile(props.data.id)
+    : await starService.toggleFolder(props.data.id)
+  if (res.status) {
+    await store.dispatch('triggerToast', { message: res.message, type: 'success' })
+    await store.dispatch('setLoadFile', true)
+  } else {
+    await store.dispatch('triggerToast', { message: res.message, type: 'error' })
+  }
 }
 
 watch(isLoadFile, () => {
@@ -248,7 +253,8 @@ watch(isLoadFile, () => {
               icon="solar:pen-2-bold-duotone"
               class="font-bold text-orange-400 dark:text-blue-600"
               height="1.8em"
-            />Ganti Nama
+            />
+            Ganti Nama
           </a>
         </li>
         <hr class="my-2" />
@@ -258,7 +264,8 @@ watch(isLoadFile, () => {
               icon="solar:share-bold-duotone"
               class="font-bold text-orange-400 dark:text-blue-600"
               height="1.8em"
-            />Bagikan
+            />
+            Bagikan
           </a>
         </li>
         <li class="dropdown" :class="[alignmentLRSubDropdown]">
@@ -291,10 +298,10 @@ watch(isLoadFile, () => {
                 Pindahkan
               </a>
             </li>
-            <li disabled="disabled">
+            <li @click="toggleStart">
               <a href="#">
                 <iconify
-                  icon="solar:star-outline"
+                  :icon="isStarred ? 'solar:star-bold' : 'solar:star-outline'"
                   class="font-bold text-orange-400 dark:text-blue-600"
                   height="1.8em"
                 />

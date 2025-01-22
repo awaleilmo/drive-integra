@@ -337,9 +337,12 @@ export default class UploadsController {
       if (isTrashView) {
         fileData = await fileData.whereNotNull('deleted_at').where('folder_id', folderId)
       } else if (isAllUpdatedView) {
-        fileData = await fileData.whereNull('deleted_at').orderBy('updated_at', 'desc')
+        fileData = await fileData.whereNull('deleted_at').orderBy('created_at', 'desc')
       } else {
-        fileData = await fileData.where('folder_id', folderId).whereNull('deleted_at')
+        fileData = await fileData
+          .where('folder_id', folderId)
+          .whereNull('deleted_at')
+          .orderBy('updated_at', 'desc')
       }
       return ctx.response.json({
         statusCode: 200,

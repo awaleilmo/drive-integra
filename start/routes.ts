@@ -77,10 +77,10 @@ router
 
     router
       .group(() => {
-        router.get('/start/file/:id', [StartController, 'toggleStarFile'])
-        router.get('/start/folder/:id', [StartController, 'toggleStarFolder'])
+        router.get('/file/:id', [StartController, 'toggleStarFile'])
+        router.get('/folder/:id', [StartController, 'toggleStarFolder'])
       })
-      .prefix('/start')
+      .prefix('/star')
       .use(middleware.auth())
 
     router
