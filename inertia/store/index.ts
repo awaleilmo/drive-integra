@@ -15,6 +15,10 @@ export default createStore({
     sideDetailIsFolder: false,
     sideDetailSelectedLength: 0,
     sideDetailSubFolder: 'Drive Saya',
+    folderPopupShow: false,
+    folderPopupData: [],
+    folderPopupFolderId: null,
+    folderPopupTitle: '',
   },
   getters: {
     isLoading: (state: any) => state.isLoading,
@@ -30,6 +34,10 @@ export default createStore({
     sideDetailIsFolder: (state: any) => state.sideDetailIsFolder,
     sideDetailSelectedLength: (state: any) => state.sideDetailSelectedLength,
     sideDetailSubFolder: (state: any) => state.sideDetailSubFolder,
+    folderPopupShow: (state: any) => state.folderPopupShow,
+    folderPopupData: (state: any) => state.folderPopupData,
+    folderPopupFolderId: (state: any) => state.folderPopupFolderId,
+    folderPopupTitle: (state: any) => state.folderPopupTitle,
   },
   mutations: {
     setLoading(state: any, status: any): void {
@@ -84,6 +92,18 @@ export default createStore({
     SET_SIDE_DETAIL_SUB_FOLDER(state: any, subFolder: string): void {
       state.sideDetailSubFolder = subFolder
     },
+    SET_FOLDER_POPUP_SHOW(state: any, show: boolean): void {
+      state.folderPopupShow = show
+    },
+    SET_FOLDER_POPUP_DATA(state: any, data: any): void {
+      state.folderPopupData = data
+    },
+    SET_FOLDER_POPUP_FOLDER_ID(state: any, folderId: any): void {
+      state.folderPopupFolderId = folderId
+    },
+    SET_FOLDER_POPUP_TITLE(state: any, title: string): void {
+      state.folderPopupTitle = title
+    },
   },
   actions: {
     showLoading({ commit }: any): void {
@@ -126,6 +146,18 @@ export default createStore({
     },
     setSideDetailSubFolder({ commit }: any, subFolder: string): void {
       commit('SET_SIDE_DETAIL_SUB_FOLDER', subFolder)
+    },
+    setFolderPopupShow({ commit }: any, show: boolean): void {
+      commit('SET_FOLDER_POPUP_SHOW', show)
+    },
+    setFolderPopupData({ commit }: any, data: any): void {
+      commit('SET_FOLDER_POPUP_DATA', data)
+    },
+    setFolderPopupFolderId({ commit }: any, folderId: any): void {
+      commit('SET_FOLDER_POPUP_FOLDER_ID', folderId)
+    },
+    setFolderPopupTitle({ commit }: any, title: string): void {
+      commit('SET_FOLDER_POPUP_TITLE', title)
     },
   },
 })

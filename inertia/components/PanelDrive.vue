@@ -14,8 +14,11 @@
         </ul>
       </div>
     </div>
+    <div class="bg-base-100 rounded-t-xl px-4 py-3 shadow-lg">
+      <slot name="panelTop"></slot>
+    </div>
     <div
-      class="bg-base-100 rounded-b-xl px-4 py-4 shadow-lg mb-5 h-[calc(100%-2.5rem)] overflow-y-auto"
+      class="bg-base-100 rounded-b-xl px-4 pb-4 shadow-lg mb-5 h-[calc(100%-2.5rem)] overflow-y-auto"
     >
       <slot name="main"></slot>
     </div>

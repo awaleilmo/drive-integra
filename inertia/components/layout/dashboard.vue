@@ -8,6 +8,7 @@ import { useStore } from 'vuex'
 import Toast from '~/components/Toast.vue'
 import MenuProgressUpload from '~/components/MenuProgressUpload.vue'
 import DetailSide from '~/components/layout/detailSide.vue'
+import FolderPopup from '~/components/FolderPopup.vue'
 
 const sidebarFn = () => {
   side.value = !side.value
@@ -88,5 +89,6 @@ onMounted(() => {
       <toast />
     </div>
   </layout>
+  <folder-popup />
   <loading :loading="isLoading" />
 </template>

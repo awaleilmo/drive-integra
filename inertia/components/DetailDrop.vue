@@ -5,7 +5,7 @@ import SideDetailStore from '~/store/side_detail.store.ts'
 import uploadService from '~/services/upload.service'
 import RenameModal from '~/components/RenameModal.vue'
 import folderService from '~/services/folder.service'
-import FolderPopup from '~/components/FolderPopup.vue'
+import folderPopupStore from '~/store/folder_popup.store.ts'
 
 const props = defineProps({
   align: {
@@ -36,6 +36,7 @@ const props = defineProps({
 
 const store = useStore()
 const sideDetailStore = new SideDetailStore(store)
+const folderStore = new folderPopupStore(store)
 const isLoadFile = computed(() => store.state.loadFile)
 
 const closeOnEscape = (e) => {
@@ -175,11 +176,12 @@ const closeRenameModal = () => {
 }
 
 const openMoveModal = () => {
-  moveModal.value.open = true
-  moveModal.value.data = {
-    data: [{ id: props.data.id, isFile: props.isFile }],
-    folderId: props.isFile ? props.data.folderId : props.data.parentId,
-  }
+  folderStore.setData(
+    true,
+    [{ id: props.data.id, isFile: props.isFile }],
+    props.isFile ? props.data.folderId : props.data.parentId,
+    props.isFile ? props.data.fileName : props.data['folderName']
+  )
 }
 
 const closeMoveModal = () => {
@@ -326,10 +328,4 @@ watch(isLoadFile, () => {
     </div>
   </div>
   <rename-modal :data="props.data" :show="rename.open" @close="closeRenameModal" :isFile="isFile" />
-  <folder-popup
-    :show="moveModal.open"
-    :data-prop="moveModal.data"
-    @close="closeMoveModal"
-    :title-name="isFile ? data.fileName : data['folderName']"
-  />
 </template>

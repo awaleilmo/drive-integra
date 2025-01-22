@@ -296,6 +296,43 @@ onBeforeUnmount(() => {
       <template #header>
         <h1 class="select-none">Drive Saya</h1>
       </template>
+      <template #panelTop>
+        <div
+          v-show="isFolderData.length > 0 || isFileData.length > 0"
+          id="menu-selected"
+          class="flex items-center gap-4 justify-start mb-2 p-0 h-9 rounded-full border border-base-300/50 bg-base-200"
+        >
+          <div v-if="selected.length > 0" class="flex justify-start items-center gap-4">
+            <iconify
+              icon="solar:close-circle-bold-duotone"
+              class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-error"
+              height="1.8em"
+              @click="selected = []"
+            />
+            <span class="text-sm font-medium w-fit select-none">{{ selected.length }} dipilih</span>
+            <div class="gap-3 flex">
+              <div class="tooltip tooltip-bottom" data-tip="Download">
+                <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
+                  <iconify icon="solar:download-square-bold-duotone" height="1.5em" />
+                </button>
+              </div>
+              <div class="tooltip tooltip-bottom" data-tip="Pindahkan">
+                <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
+                  <iconify icon="solar:move-to-folder-bold-duotone" height="1.5em" />
+                </button>
+              </div>
+              <div class="tooltip tooltip-bottom" data-tip="Pindahkan ke Sampah">
+                <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
+                  <iconify icon="solar:trash-bin-trash-bold-duotone" height="1.5em" />
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-else class="px-3 py-2 text-xs leading-4 text-gray-400 select-none">
+            Tarik file Anda ke sini atau gunakan tombol '+' atau klik kanan untuk upload
+          </div>
+        </div>
+      </template>
       <template #main>
         <div
           class="relative"
@@ -315,50 +352,12 @@ onBeforeUnmount(() => {
           ></div>
           <div
             id="scroll-container"
-            class="w-full relative h-full overflow-y-scroll overflow-x-hidden"
+            class="w-full relative min-h-[calc(90vh-5.5rem)] h-full overflow-y-auto overflow-x-hidden"
             @dragover.prevent="onDragOver"
             @dragleave="onDragLeave"
             @drop.prevent="onDrop"
             @contextmenu="showContextMenu"
           >
-            <div
-              v-show="isFolderData.length > 0 || isFileData.length > 0"
-              id="menu-selected"
-              class="flex items-center gap-4 justify-start mb-2 p-0 h-9 rounded-full border border-base-300/50 bg-base-200"
-            >
-              <div v-if="selected.length > 0" class="flex justify-start items-center gap-4">
-                <iconify
-                  icon="solar:close-circle-bold-duotone"
-                  class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-error"
-                  height="1.8em"
-                  @click="selected = []"
-                />
-                <span class="text-sm font-medium w-fit select-none"
-                  >{{ selected.length }} dipilih</span
-                >
-                <div class="gap-3 flex">
-                  <div class="tooltip tooltip-bottom" data-tip="Download">
-                    <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
-                      <iconify icon="solar:download-square-bold-duotone" height="1.5em" />
-                    </button>
-                  </div>
-                  <div class="tooltip tooltip-bottom" data-tip="Pindahkan">
-                    <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
-                      <iconify icon="solar:move-to-folder-bold-duotone" height="1.5em" />
-                    </button>
-                  </div>
-                  <div class="tooltip tooltip-bottom" data-tip="Pindahkan ke Sampah">
-                    <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
-                      <iconify icon="solar:trash-bin-trash-bold-duotone" height="1.5em" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div v-else class="px-3 py-2 text-xs leading-4 text-gray-400 select-none">
-                Tarik file Anda ke sini atau gunakan tombol '+' atau klik kanan untuk upload
-              </div>
-            </div>
-
             <label v-if="isFolderData.length > 0" class="text-base font-medium select-none"
               >Folder</label
             >
