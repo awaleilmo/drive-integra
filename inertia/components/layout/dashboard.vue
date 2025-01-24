@@ -9,6 +9,7 @@ import Toast from '~/components/Toast.vue'
 import MenuProgressUpload from '~/components/MenuProgressUpload.vue'
 import DetailSide from '~/components/layout/detailSide.vue'
 import FolderPopup from '~/components/FolderPopup.vue'
+import RenameModal from '~/components/RenameModal.vue'
 
 const sidebarFn = () => {
   side.value = !side.value
@@ -90,5 +91,6 @@ onMounted(() => {
     </div>
   </layout>
   <folder-popup />
+  <rename-modal />
   <loading :loading="isLoading" />
 </template>

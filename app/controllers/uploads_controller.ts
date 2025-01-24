@@ -342,7 +342,7 @@ export default class UploadsController {
         fileData = await fileData
           .where('folder_id', folderId)
           .whereNull('deleted_at')
-          .orderBy('updated_at', 'desc')
+          .orderBy('created_at', 'desc')
       }
       return ctx.response.json({
         statusCode: 200,

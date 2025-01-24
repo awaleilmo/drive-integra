@@ -5,57 +5,41 @@ import { useStore } from 'vuex'
 import UploadService from '~/services/upload.service'
 import FolderService from '~/services/folder.service'
 
-const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  data: {
-    type: Object,
-    default: {},
-  },
-  closeable: {
-    type: Boolean,
-    default: true,
-  },
-  isFile: {
-    type: Boolean,
-    default: false,
-  },
-})
 const store = useStore()
+
+const show = computed(() => store.state.renameModal.show)
+const data = computed(() => store.state.renameModal.data)
+const isFile = computed(() => store.state.renameModal.isFile)
 
 const form = computed(() => {
   return {
-    name: props.data.folderName || props.data.fileName,
+    name: data.value['folderName'] || data.value['fileName'],
   }
 })
 
 const inputField = ref(null)
 
-const emit = defineEmits(['close'])
-
 const closeModal = () => {
-  if (props.closeable) {
-    emit('close')
-  }
+  store.dispatch('setRenameModalShow', false)
+  store.dispatch('setRenameModalData', {})
+  store.dispatch('setRenameModalIsFile', false)
 }
 
 const save = async () => {
   await store.dispatch('showLoading')
 
   try {
-    const data = props.isFile
-      ? await UploadService.renameFile(props.data.id, form.value)
-      : await FolderService.renameFolder(props.data.id, form.value)
-    if (data.status) {
-      await store.dispatch('triggerToast', { message: data.message, type: 'success' })
+    const res = isFile.value
+      ? await UploadService.renameFile(data.value.id, form.value)
+      : await FolderService.renameFolder(data.value.id, form.value)
+    if (res.status) {
+      await store.dispatch('triggerToast', { message: res.message, type: 'success' })
       await store.dispatch('setLoadFile', true)
-      setTimeout( () => {
+      setTimeout(() => {
         closeModal()
       }, 200)
     } else {
-      await store.dispatch('triggerToast', { message: data.message, type: 'error' })
+      await store.dispatch('triggerToast', { message: res.message, type: 'error' })
     }
     await store.dispatch('hideLoading')
   } catch (error) {
@@ -65,7 +49,7 @@ const save = async () => {
 }
 
 watchEffect(() => {
-  if (props.show) {
+  if (show.value) {
     nextTick(() => {
       inputField.value.focus()
       inputField.value.setSelectionRange(0, inputField.value.value.length)
@@ -74,7 +58,7 @@ watchEffect(() => {
 })
 </script>
 <template>
-  <Modal :show="props.show" @close="closeModal" maxWidth="sm">
+  <Modal :show="show" @close="closeModal" maxWidth="sm">
     <div class="py-6 px-6 form-control">
       <label class="text-2xl font-medium">Ganti nama</label>
       <input

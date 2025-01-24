@@ -3,7 +3,6 @@ import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
 import { useStore } from 'vuex'
 import SideDetailStore from '~/store/side_detail.store.ts'
 import uploadService from '~/services/upload.service'
-import RenameModal from '~/components/RenameModal.vue'
 import folderService from '~/services/folder.service'
 import starService from '~/services/star.service.ts'
 import folderPopupStore from '~/store/folder_popup.store.ts'
@@ -46,9 +45,6 @@ const closeOnEscape = (e) => {
     open.value = false
   }
 }
-const rename = ref({
-  open: false,
-})
 
 onMounted(() => document.addEventListener('keydown', closeOnEscape))
 onUnmounted(() => document.removeEventListener('keydown', closeOnEscape))
@@ -165,11 +161,9 @@ watch(open, (newVal) => {
 })
 
 const openRenameModal = () => {
-  rename.value.open = true
-}
-
-const closeRenameModal = () => {
-  rename.value.open = false
+  store.dispatch('setRenameModalData', props.data)
+  store.dispatch('setRenameModalIsFile', props.isFile)
+  store.dispatch('setRenameModalShow', true)
 }
 
 const openMoveModal = () => {
@@ -334,5 +328,4 @@ watch(isLoadFile, () => {
       </ul>
     </div>
   </div>
-  <rename-modal :data="props.data" :show="rename.open" @close="closeRenameModal" :isFile="isFile" />
 </template>

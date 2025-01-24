@@ -19,6 +19,11 @@ export default createStore({
     folderPopupData: [],
     folderPopupFolderId: null,
     folderPopupTitle: '',
+    renameModal: {
+      data: {},
+      show: false,
+      isFile: false,
+    },
   },
   getters: {
     isLoading: (state: any) => state.isLoading,
@@ -38,6 +43,8 @@ export default createStore({
     folderPopupData: (state: any) => state.folderPopupData,
     folderPopupFolderId: (state: any) => state.folderPopupFolderId,
     folderPopupTitle: (state: any) => state.folderPopupTitle,
+    renameModal: (state: any) => state.renameModal,
+    tabPanelTop: (state: any) => state.tabPanelTop,
   },
   mutations: {
     setLoading(state: any, status: any): void {
@@ -104,6 +111,15 @@ export default createStore({
     SET_FOLDER_POPUP_TITLE(state: any, title: string): void {
       state.folderPopupTitle = title
     },
+    SET_RENAME_MODAL_DATA(state: any, data: any): void {
+      state.renameModal.data = data
+    },
+    SET_RENAME_MODAL_SHOW(state: any, show: boolean): void {
+      state.renameModal.show = show
+    },
+    SET_RENAME_MODAL_IS_FILE(state: any, isFile: boolean): void {
+      state.renameModal.isFile = isFile
+    },
   },
   actions: {
     showLoading({ commit }: any): void {
@@ -158,6 +174,15 @@ export default createStore({
     },
     setFolderPopupTitle({ commit }: any, title: string): void {
       commit('SET_FOLDER_POPUP_TITLE', title)
+    },
+    setRenameModalData({ commit }: any, data: any): void {
+      commit('SET_RENAME_MODAL_DATA', data)
+    },
+    setRenameModalShow({ commit }: any, show: boolean): void {
+      commit('SET_RENAME_MODAL_SHOW', show)
+    },
+    setRenameModalIsFile({ commit }: any, isFile: boolean): void {
+      commit('SET_RENAME_MODAL_IS_FILE', isFile)
     },
   },
 })

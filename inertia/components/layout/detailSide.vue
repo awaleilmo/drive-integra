@@ -47,7 +47,6 @@ const sideBarFun = () => {
 const loadData = async () => {
   isRender.value = true
   checkID.value = false
-  console.log('folderIDState.value', folderIDState.value)
   if (fileIDState.value !== null || folderIDState.value !== null) {
     checkID.value = true
     getID.value = isFolder.value ? folderIDState.value : fileIDState.value
