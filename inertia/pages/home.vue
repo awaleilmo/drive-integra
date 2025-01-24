@@ -321,6 +321,11 @@ onBeforeUnmount(() => {
                   <iconify icon="solar:move-to-folder-bold-duotone" height="1.5em" />
                 </button>
               </div>
+              <div class="tooltip tooltip-bottom" data-tip="Tambahkan ke berbintang">
+                <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
+                  <iconify icon="solar:star-outline" height="1.5em" />
+                </button>
+              </div>
               <div class="tooltip tooltip-bottom" data-tip="Pindahkan ke Sampah">
                 <button class="cursor-pointer btn btn-ghost btn-circle btn-sm hover:text-info">
                   <iconify icon="solar:trash-bin-trash-bold-duotone" height="1.5em" />
