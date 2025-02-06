@@ -215,6 +215,7 @@ const getFolder = async () => {
 
 const selectedFn = (item, isFolder, ctrlKey) => {
   if (sideDetail.value) {
+    console.log('masuk')
     sideDetailStore.actionUpdateDataAndFolder(item.id, isFolder)
   }
 

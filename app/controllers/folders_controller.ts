@@ -2,9 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { addFolder, renameFolder, moveFolder } from '#validators/folder'
 import { decrypt } from '#services/encryption_service'
 import Folder from '#models/folder'
-import fs from 'node:fs'
 import path from 'node:path'
-import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 
 export default class FoldersController {
@@ -30,7 +28,6 @@ export default class FoldersController {
       check.where('user_id', userId)
       const checkData = await check.first()
       if (!checkData) {
-        fs.mkdirSync(app.publicPath(folderPath), { recursive: true })
         const rest = new Folder()
         rest.userId = userId
         rest.parentId = parentId

@@ -206,6 +206,10 @@ const toggleStart = async () => {
   }
 }
 
+const btnShare = () => {
+  console.log('masuk')
+}
+
 watch(isLoadFile, () => {
   open.value = false
 })
@@ -252,7 +256,7 @@ watch(isLoadFile, () => {
           </a>
         </li>
         <hr class="my-2" />
-        <li class="disabled">
+        <li @click="btnShare">
           <a>
             <iconify
               icon="solar:share-bold-duotone"

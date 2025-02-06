@@ -28,6 +28,7 @@ const isRender = ref(true)
 const isImage = ref(false)
 const checkID = ref(false)
 const getID = ref(null)
+const compSideDetailToggle = computed(() => store.state.sideDetail)
 const fileIDState = computed(() => store.state.sideDetailFileID)
 const folderIDState = computed(() => store.state.sideDetailFolderID)
 const isFolder = computed(() => store.state.sideDetailIsFolder)
@@ -105,7 +106,14 @@ const ownerOrNot = (item, name) => {
   return pages.id === item ? 'Saya' : name
 }
 
-watch(folderIDState, loadData, { deep: true })
+watch(
+  () => {
+    if (compSideDetailToggle.value) {
+      loadData()
+    }
+  },
+  { deep: true }
+)
 </script>
 <template>
   <div

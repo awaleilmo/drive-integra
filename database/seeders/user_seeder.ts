@@ -12,6 +12,22 @@ export default class extends BaseSeeder {
         password: 'SuperAdmin2020',
         isActive: 1,
       },
+      {
+        roleId: 2,
+        fullName: 'Admin',
+        username: 'admin',
+        email: 'Admin@integrapadma.com',
+        password: 'Admin2020',
+        isActive: 1,
+      },
+      {
+        roleId: 3,
+        fullName: 'Awaludin',
+        username: 'awaludin',
+        email: 'awaludin@integrapadma.com',
+        password: 'User2020',
+        isActive: 1,
+      },
     ])
   }
 }

@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
-import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import User from './user.js'
 import Folder from './folder.js'
 
@@ -40,6 +40,18 @@ export default class Upload extends BaseModel {
 
   @column()
   declare version: number
+
+  @column({
+    consume: (value) => {
+      try {
+        return value ? JSON.parse(value) : []
+      } catch {
+        return []
+      }
+    },
+    prepare: (value) => JSON.stringify(value ?? []),
+  })
+  declare sharedWithUsers: number[]
 
   @column()
   declare description: string | null
@@ -85,4 +97,16 @@ export default class Upload extends BaseModel {
     foreignKey: 'createdBy',
   })
   declare createdByUser: BelongsTo<typeof User>
+
+  @hasMany(() => User, {
+    foreignKey: 'id',
+  })
+  declare sharedUsers: HasMany<typeof User>
+
+  async loadSharedUsers() {
+    if (!this.sharedWithUsers || this.sharedWithUsers.length === 0) {
+      return []
+    }
+    return await User.query().whereIn('id', this.sharedWithUsers)
+  }
 }

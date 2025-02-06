@@ -24,6 +24,7 @@ export default class extends BaseSchema {
       table.boolean('is_starred').defaultTo(false)
       table.integer('same_file_count').defaultTo(0)
       table.integer('version').defaultTo(0)
+      table.json('shared_with_users').notNullable().defaultTo(JSON.stringify([]))
 
       table.timestamp('opened_at').nullable()
       table.integer('opened_by').nullable()

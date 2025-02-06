@@ -17,6 +17,7 @@ export default class extends BaseSchema {
       table.string('folder_name', 255).notNullable() // Nama folder
       table.string('folder_path', 255).notNullable() // Path folder
       table.boolean('is_starred').defaultTo(false)
+      table.json('shared_with_users').notNullable().defaultTo(JSON.stringify([]))
 
       table.timestamp('opened_at').nullable()
       table.integer('opened_by').nullable()

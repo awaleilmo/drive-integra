@@ -24,6 +24,18 @@ export default class Folder extends BaseModel {
   @column()
   declare isStarred: boolean
 
+  @column({
+    consume: (value) => {
+      try {
+        return value ? JSON.parse(value) : []
+      } catch {
+        return []
+      }
+    },
+    prepare: (value) => JSON.stringify(value ?? []),
+  })
+  declare sharedWithUsers: number[]
+
   @column()
   declare openedAt: DateTime | null
 
@@ -77,4 +89,16 @@ export default class Folder extends BaseModel {
     foreignKey: 'createdBy',
   })
   declare createdByUser: BelongsTo<typeof User>
+
+  @hasMany(() => User, {
+    foreignKey: 'id',
+  })
+  declare sharedUsers: HasMany<typeof User>
+
+  async loadSharedUsers() {
+    if (!this.sharedWithUsers || this.sharedWithUsers.length === 0) {
+      return []
+    }
+    return await User.query().whereIn('id', this.sharedWithUsers)
+  }
 }
