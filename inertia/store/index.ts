@@ -24,6 +24,10 @@ export default createStore({
       show: false,
       isFile: false,
     },
+    sharedPopup: {
+      show: false,
+      data: [],
+    },
   },
   getters: {
     isLoading: (state: any) => state.isLoading,
@@ -44,7 +48,7 @@ export default createStore({
     folderPopupFolderId: (state: any) => state.folderPopupFolderId,
     folderPopupTitle: (state: any) => state.folderPopupTitle,
     renameModal: (state: any) => state.renameModal,
-    tabPanelTop: (state: any) => state.tabPanelTop,
+    sharedPopup: (state: any) => state.sharedPopup,
   },
   mutations: {
     setLoading(state: any, status: any): void {
@@ -120,6 +124,12 @@ export default createStore({
     SET_RENAME_MODAL_IS_FILE(state: any, isFile: boolean): void {
       state.renameModal.isFile = isFile
     },
+    SET_SHARED_POPUP_SHOW(state: any, data: any): void {
+      state.sharedPopup.show = data
+    },
+    SET_SHARED_POPUP_DATA(state: any, data: any): void {
+      state.sharedPopup.data = data
+    },
   },
   actions: {
     showLoading({ commit }: any): void {
@@ -183,6 +193,12 @@ export default createStore({
     },
     setRenameModalIsFile({ commit }: any, isFile: boolean): void {
       commit('SET_RENAME_MODAL_IS_FILE', isFile)
+    },
+    setSharedPopupShow({ commit }: any, data: any): void {
+      commit('SET_SHARED_POPUP_SHOW', data)
+    },
+    setSharedPopupData({ commit }: any, data: any): void {
+      commit('SET_SHARED_POPUP_DATA', data)
     },
   },
 })
