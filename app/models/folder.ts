@@ -25,13 +25,7 @@ export default class Folder extends BaseModel {
   declare isStarred: boolean
 
   @column({
-    consume: (value) => {
-      try {
-        return value ? JSON.parse(value) : []
-      } catch {
-        return []
-      }
-    },
+    consume: (value) => value || [],
     prepare: (value) => JSON.stringify(value ?? []),
   })
   declare sharedWithUsers: number[]
@@ -90,15 +84,9 @@ export default class Folder extends BaseModel {
   })
   declare createdByUser: BelongsTo<typeof User>
 
-  @hasMany(() => User, {
-    foreignKey: 'id',
-  })
-  declare sharedUsers: HasMany<typeof User>
-
-  async loadSharedUsers() {
-    if (!this.sharedWithUsers || this.sharedWithUsers.length === 0) {
-      return []
-    }
-    return await User.query().whereIn('id', this.sharedWithUsers)
+  async getSharedUsers() {
+    const userIds = this.sharedWithUsers || []
+    if (userIds.length === 0) return []
+    return await User.query().whereIn('id', userIds)
   }
 }

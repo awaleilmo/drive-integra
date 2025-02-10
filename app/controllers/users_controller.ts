@@ -26,4 +26,23 @@ export default class UsersController {
     await ctx.auth.use('web').logout()
     return ctx.response.redirect('/')
   }
+
+  async showUserBatch(ctx: HttpContext) {
+    try {
+      const payload = ctx.request.input('ids', [])
+      const result = await User.query().whereIn('id', payload)
+      return ctx.response.json({
+        status: true,
+        statusCode: 200,
+        message: 'Success',
+        data: result,
+      })
+    } catch (error) {
+      ctx.response.json({
+        statusCode: 500,
+        status: false,
+        message: error.message,
+      })
+    }
+  }
 }

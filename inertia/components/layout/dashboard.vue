@@ -10,6 +10,7 @@ import MenuProgressUpload from '~/components/MenuProgressUpload.vue'
 import DetailSide from '~/components/layout/detailSide.vue'
 import FolderPopup from '~/components/FolderPopup.vue'
 import RenameModal from '~/components/RenameModal.vue'
+import SharedPopUp from '~/components/SharedPopUp.vue'
 
 const sidebarFn = () => {
   side.value = !side.value
@@ -92,5 +93,6 @@ onMounted(() => {
   </layout>
   <folder-popup />
   <rename-modal />
+  <shared-pop-up />
   <loading :loading="isLoading" />
 </template>

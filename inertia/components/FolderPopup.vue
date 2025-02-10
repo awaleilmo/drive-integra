@@ -7,8 +7,6 @@ import uploadService from '~/services/upload.service.ts'
 import folderPopupStore from '~/store/folder_popup.store.ts'
 import { useStore } from 'vuex'
 
-const emit = defineEmits(['close'])
-
 const folderModal = ref({
   open: false,
   name: 'Folder tanpa nama',

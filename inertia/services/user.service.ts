@@ -61,6 +61,10 @@ class UserService {
   async login() {
     return await sysService.serviceGuest('POST', API_URL + '/auth/login', this.data())
   }
+
+  async showUserBatch(ids: any) {
+    return await sysService.serviceAuth('GET', API_URL + '/showUserBatch?ids=' + ids)
+  }
 }
 
 export default new UserService()

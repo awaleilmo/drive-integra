@@ -84,6 +84,9 @@ class FolderService {
   async moveFolder(data: any) {
     return await sysService.serviceAuth('POST', API_URL + '/move', data)
   }
+  async sharedPost(id: string, data: any) {
+    return await sysService.serviceAuth('POST', API_URL + '/shared/' + id, data)
+  }
 }
 
 export default new FolderService()

@@ -207,7 +207,13 @@ const toggleStart = async () => {
 }
 
 const btnShare = () => {
-  console.log('masuk')
+  store.dispatch('setSharedPopupShow', true)
+  store.dispatch('setSharedPopupData', [
+    {
+      isFile: props.isFile,
+      data: props.data,
+    },
+  ])
 }
 
 watch(isLoadFile, () => {

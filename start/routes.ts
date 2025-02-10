@@ -42,6 +42,11 @@ router
     router
       .group(() => {
         router.post('/auth/login', [UsersController, 'login']).use(middleware.guest())
+        router
+          .group(() => {
+            router.get('/showUserBatch', [UsersController, 'showUserBatch'])
+          })
+          .use(middleware.auth())
       })
       .prefix('/users')
 
@@ -54,6 +59,7 @@ router
         router.post('/recovery/:id', [FoldersController, 'recoveryFolder'])
         router.post('/openedAt/:id', [FoldersController, 'openedAt'])
         router.get('/getById/:id', [FoldersController, 'getById'])
+        router.post('/shared/:id', [FoldersController, 'updateSharedUsers'])
         router.post('/move', [FoldersController, 'moveFolder'])
       })
       .prefix('/folder')
