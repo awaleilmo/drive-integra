@@ -10,7 +10,10 @@ const isLoading = ref(true)
 const show = computed(() => store.state.sharedPopup.show ?? false)
 const data = computed(() => store.state.sharedPopup.data ?? [])
 const selected = ref([])
-const modelSharedUser = ref([])
+const popUpModalAddUser = ref({
+  open: false,
+  data: [],
+})
 
 const loadItems = () => {
   const payload = data.value
@@ -37,6 +40,14 @@ const closeModal = () => {
   store.dispatch('setSharedPopupShow', false)
 }
 
+const closeModalAddUser = () => {
+  popUpModalAddUser.value.open = false
+}
+
+const openModalAddUser = () => {
+  popUpModalAddUser.value.open = true
+}
+
 const toggleCheckedAll = () => {
   if (selected.value.length === data.value.length) {
     selected.value = []
@@ -57,12 +68,17 @@ const save = () => {
   data.value.forEach(async (item, index) => {
     if (selected.value.includes(index)) {
       let payload = {
-        sharedWithUsers: [2, 3],
+        sharedWithUsers: item.data.sharedWithUsers,
       }
       const res = await folderService.sharedPost(item.data.id, payload)
-      console.log(res)
+      if (res.status) {
+        await store.dispatch('triggerToast', { message: res.message, type: 'success' })
+      } else {
+        await store.dispatch('triggerToast', { message: res.message, type: 'error' })
+      }
     }
   })
+  store.dispatch('setLoadFile', true)
   store.dispatch('setSharedPopupShow', false)
 }
 
@@ -83,7 +99,7 @@ watch(
       <div class="flex flex-row items-center justify-between w-full">
         <label class="text-xl text-start font-medium">Kelola Akses</label>
         <div class="flex gap-2">
-          <button class="btn btn-primary btn-sm">Add</button>
+          <button class="btn btn-primary btn-sm" @click="openModalAddUser">Add</button>
           <button class="btn btn-success btn-sm" @click="save">Save</button>
         </div>
       </div>
@@ -144,6 +160,18 @@ watch(
           </tbody>
         </table>
       </div>
+    </div>
+  </modal>
+  <modal :show="popUpModalAddUser.open" @close="closeModalAddUser" maxWidth="2xl">
+    <div class="py-6 px-6 flex flex-col items-start justify-start">
+      <div class="flex flex-row items-center justify-between w-full">
+        <label class="text-xl text-start font-medium">Tambah Users</label>
+        <label class="input input-bordered flex items-center gap-2 w-2/3">
+          <input type="text" class="grow" placeholder="Search" />
+          <iconify icon="line-md:search-twotone" class="font-bold" height="1.8em" />
+        </label>
+      </div>
+      <div class="overflow-y-auto w-full border-t mt-6"></div>
     </div>
   </modal>
 </template>
